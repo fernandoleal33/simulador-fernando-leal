@@ -531,6 +531,10 @@
             atualizarBancoPorProduto(prod);
             atualizarTaxaCenario();
             document.getElementById('painelIndices').style.display=prod==='investimento'?'block':'none';
+            const investimento=prod==='investimento';
+            document.getElementById('resEconomia').closest('.grid.grid-cols-1').style.display=investimento?'none':'grid';
+            document.getElementById('textoDiferencas').parentElement.style.display=investimento?'none':'block';
+            document.getElementById('blocoBancoImovel').parentElement.style.display=investimento?'none':'block';
             document.getElementById('mesContemplacao').value=p.mes;
             document.getElementById('lanceLivre').value='0,00';
             document.getElementById('lanceEmbutidoPct').value=0;
