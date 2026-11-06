@@ -146,7 +146,7 @@
                     <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-700">
                         <div>
                             <label class="block text-xs font-medium text-emerald-400 mb-1">Prazo Consórcio (Meses)</label>
-                            <input type="number" id="prazoConsorcio" value="200" min="1" max="300" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                            <input type="number" id="prazoConsorcio" value="200" min="1" max="240" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-red-400 mb-1">Prazo Financiamento (Meses)</label>
@@ -285,7 +285,7 @@
 
             <!-- Results & Analysis Area -->
             <div class="lg:col-span-8 space-y-6">
-                <section id="painelIndices" class="bg-slate-800/60 border border-slate-700 rounded-xl p-5 space-y-3" style="display:none"><h2 class="text-lg font-semibold">Projeção patrimonial com índices oficiais</h2><p class="text-xs text-slate-300">O reajuste da carta não é rendimento. Valorização e aluguel são hipóteses, sem garantia de retorno ou contemplação.</p><label class="block">Índice<select id="indiceOficial" class="w-full bg-slate-900 p-2"><option value="192">INCC — FGV</option><option value="433">IPCA — IBGE</option><option value="189">IGP-M — FGV</option><option value="manual">Taxa manual</option></select></label><label class="block">Taxa anual para projeção (%)<input id="taxaOficial" type="number" step="0.01" class="w-full bg-slate-900 p-2"></label><label class="block">Horizonte (anos)<input id="anosIndice" type="number" value="10" min="1" max="30" class="w-full bg-slate-900 p-2"></label><label class="block">Valorização hipotética do imóvel (% a.a.)<input id="valorizacaoIndice" type="number" value="4" step="0.1" class="w-full bg-slate-900 p-2"></label><p id="statusIndice" class="text-xs text-amber-200">Aguardando consulta...</p><button type="button" onclick="consultarIndices()" class="bg-emerald-600 rounded p-2">Atualizar índices</button><div id="resultadoIndice" class="space-y-2 text-sm"></div><p class="text-xs text-slate-400">Fonte: Banco Central/SGS. Projeção repete hipoteticamente o acumulado dos últimos 12 meses; não representa previsão ou lucro líquido. Não inclui custos contratuais, impostos ou parcelas.</p></section>
+                <section id="painelIndices" class="bg-slate-800/60 border border-slate-700 rounded-xl p-5 space-y-3" style="display:none"><h2 class="text-lg font-semibold">Projeção patrimonial com índices oficiais</h2><p class="text-xs text-slate-300">O reajuste da carta não é rendimento. Valorização e aluguel são hipóteses, sem garantia de retorno ou contemplação.</p><label class="block">Índice<select id="indiceOficial" class="w-full bg-slate-900 p-2"><option value="192">INCC — FGV</option><option value="433">IPCA — IBGE</option><option value="189">IGP-M — FGV</option><option value="manual">Taxa manual</option></select></label><label class="block">Taxa anual para projeção (%)<input id="taxaOficial" type="number" step="0.01" class="w-full bg-slate-900 p-2"></label><label class="block">Horizonte da projeção (meses, até 240)<input id="anosIndice" type="number" value="180" min="1" max="240" step="1" class="w-full bg-slate-900 p-2"></label><label class="flex gap-2 items-center"><input id="vincularPrazoPatrimonial" type="checkbox" checked> Acompanhar automaticamente o prazo do consórcio</label><label class="block">Valorização hipotética do imóvel (% a.a.)<input id="valorizacaoIndice" type="number" value="4" step="0.1" class="w-full bg-slate-900 p-2"></label><p id="statusIndice" class="text-xs text-amber-200">Aguardando consulta...</p><button type="button" onclick="consultarIndices()" class="bg-emerald-600 rounded p-2">Atualizar índices</button><div id="resultadoIndice" class="space-y-2 text-sm"></div><p class="text-xs text-slate-400">Fonte: Banco Central/SGS. Projeção repete hipoteticamente o acumulado dos últimos 12 meses; não representa previsão ou lucro líquido. Não inclui custos contratuais, impostos ou parcelas.</p></section>
                  <!-- Top Summary Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="bg-slate-800/60 border border-slate-700/60 p-4 rounded-xl">
@@ -531,6 +531,7 @@
             atualizarBancoPorProduto(prod);
             atualizarTaxaCenario();
             document.getElementById('painelIndices').style.display=prod==='investimento'?'block':'none';
+            if(prod==='investimento'){document.getElementById('prazoConsorcio').value=240;sincronizarPrazoPatrimonial();}
             const investimento=prod==='investimento';
             document.getElementById('resEconomia').closest('.grid.grid-cols-1').style.display=investimento?'none':'grid';
             document.getElementById('textoDiferencas').parentElement.style.display=investimento?'none':'block';
@@ -711,17 +712,26 @@
           document.getElementById('statusIndice').textContent=dado?'Acumulado oficial dos últimos 12 meses: '+dado.anual.toFixed(2)+'%; competência mais recente: '+dado.data+'.':codigo==='manual'?'Taxa manual, não oficial.':'Consulta indisponível para este índice. Selecione Manual para usar uma hipótese.';
           calcularIndice();
         }
+        function sincronizarPrazoPatrimonial(){
+          const vinculado=document.getElementById('vincularPrazoPatrimonial').checked;
+          const horizonte=document.getElementById('anosIndice');
+          horizonte.disabled=vinculado;
+          if(vinculado)horizonte.value=Math.max(1,Math.min(240,Math.floor(num('prazoConsorcio',240))));
+          calcularIndice();
+        }
         function calcularIndice(){
           const out=document.getElementById('resultadoIndice');
           const raw=document.getElementById('taxaOficial').value;
           const taxa=raw===''?NaN:Number(raw);
           const valor=parseMoeda(document.getElementById('credito').value);
-          const anos=Math.max(1,Math.min(30,num('anosIndice',10)));
+          const meses=Math.max(1,Math.min(240,Math.floor(num('anosIndice',180))));
+          const anos=meses/12;
           const valorizacao=num('valorizacaoIndice',4);
           if(!Number.isFinite(taxa)||taxa<=-100||valorizacao<=-100||valor<=0){out.textContent='Aguardando índice oficial ou taxa manual válida.';window.propostaIndice='';return;}
           const credito=valor*Math.pow(1+taxa/100,anos);
           const imovel=valor*Math.pow(1+valorizacao/100,anos);
           out.replaceChildren();
+          const periodo=document.createElement('p');periodo.textContent='Horizonte da projeção: '+meses+' meses ('+anos.toLocaleString('pt-BR',{maximumFractionDigits:2})+' anos).';out.appendChild(periodo);
           for(const [rotulo,quantia] of [['Carta inicial',valor],['Carta corrigida (hipótese)',credito],['Valor projetado do imóvel',imovel],['Valorização nominal hipotética do imóvel',imovel-valor]]){
             const p=document.createElement('p');p.textContent=rotulo+': '+fmt(quantia);out.appendChild(p);
           }
@@ -779,6 +789,8 @@
             mudarProduto();
             document.getElementById('indiceOficial').addEventListener('change',atualizarIndice);
             for(const id of ['taxaOficial','anosIndice','valorizacaoIndice'])document.getElementById(id).addEventListener('input',calcularIndice);
+            document.getElementById('prazoConsorcio').addEventListener('input',sincronizarPrazoPatrimonial);
+            document.getElementById('vincularPrazoPatrimonial').addEventListener('change',sincronizarPrazoPatrimonial);
             consultarIndices();
             document.getElementById('entradaPct').addEventListener('input', calcular);
             document.getElementById('prazoFin').addEventListener('input', calcular);
