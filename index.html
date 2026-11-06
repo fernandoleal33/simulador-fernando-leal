@@ -756,7 +756,6 @@
         const tabelaPlanos={
           imovel:{
             alphaPlus:{nome:'Alpha Plus',prazos:[200,180,160,140,120,100,80,60],adm:[20,18,18,17,16,15,14,13],antecipacao:4,mesesAntecipacao:1},
-            betha:{nome:'Betha',prazos:[200,180,160,140,120,100,80,60],adm:[22,20,20,19,18,17,16,15],antecipacao:2,mesesAntecipacao:1},
             gamma:{nome:'Gamma',prazos:[200,180,160,140,120,100,80,60],adm:[24,22,22,21,20,18,17,16],antecipacao:1,mesesAntecipacao:1},
             gamma12:{nome:'Gamma 12',prazos:[200,180,160,140,120,100,80,60],adm:[24,22,22,21,20,18,17,16],antecipacao:1,mesesAntecipacao:12,nota:'Taxas Gamma usadas como referência; confirmar condições próprias da Gamma 12.'},
             red50:{nome:'Reduzida 50% — sem antecipação (condição informada)',prazos:[200,180,160,140],adm:[22,22,22,21],antecipacao:0,mesesAntecipacao:0,reducao:0.5,nota:'A tabela Ômega 50% do PDF registra 2% de antecipação; esta simulação usa 0% conforme condição informada. Confirmar tabela contratual.'}
@@ -765,7 +764,6 @@
             alphaPlus:{nome:'Alpha Plus',prazos:[80,70,60,50,36],adm:[15,14,13,12,11],antecipacao:4,mesesAntecipacao:1},
             betha:{nome:'Betha',prazos:[80,70,60,50,36,24],adm:[17,16,15,14,13,12],antecipacao:1,mesesAntecipacao:1},
             gamma:{nome:'Gamma',prazos:[80,70,60,50,36,24],adm:[18,17,16,15,14,13],antecipacao:0,mesesAntecipacao:0},
-            betha30:{nome:'Betha — reduzida 30%',prazos:[100,80,60],adm:[19,17,15],antecipacao:1,mesesAntecipacao:1,reducao:0.7},
             gamma30:{nome:'Gamma — reduzida 30%',prazos:[100,80,60],adm:[20,18,16],antecipacao:0,mesesAntecipacao:0,reducao:0.7}
           },
           pesados:{
@@ -791,7 +789,7 @@
           const credito=document.getElementById('creditoUnifisa'),prazo=document.getElementById('prazoUnifisa');
           credito.replaceChildren();prazo.replaceChildren();
           if(!sel.value){document.getElementById('detalheUnifisa').textContent='Selecione uma tabela comercial para preencher os parâmetros automaticamente.';return;}
-          const creditos=(produto==='auto'&&['betha30','gamma30'].includes(sel.value))?[300000,280000,260000,240000,220000,200000,190000,180000,170000,160000,150000,140000,130000,120000,110000,100000,90000,80000,70000]:creditosTabela[produto];
+          const creditos=(produto==='auto'&&sel.value==='gamma30')?[300000,280000,260000,240000,220000,200000,190000,180000,170000,160000,150000,140000,130000,120000,110000,100000,90000,80000,70000]:creditosTabela[produto];
           for(const v of creditos){const o=document.createElement('option');o.value=v;o.textContent=fmt(v);credito.appendChild(o);}
           for(const v of planos[sel.value].prazos){const o=document.createElement('option');o.value=v;o.textContent=v+' meses';prazo.appendChild(o);}
           aplicarTabelaUnifisa();
