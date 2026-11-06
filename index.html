@@ -172,7 +172,7 @@
                     <p class="text-[10px] text-slate-400">Informe os percentuais totais e o seguro previstos na proposta/contrato. Não confunda taxa anual divulgada com taxa total do plano. Os valores iniciais são apenas exemplos editáveis, não taxas oficiais da administradora.</p>
 
                     <!-- Parcela Reduzida Optativa -->
-                    <div id="blocoParcelaReduzida" class="pt-2 border-t border-slate-700 space-y-2">
+                    <div id="blocoParcelaReduzida" style="display:none" aria-hidden="true" class="pt-2 border-t border-slate-700 space-y-2">
                         <label class="flex items-center justify-between cursor-pointer">
                             <span class="text-xs font-semibold text-emerald-400">Ativar Parcela Reduzida (Opcional)</span>
                             <input type="checkbox" id="ativarReduzida" onchange="toggleReduzida()" class="w-4 h-4 text-emerald-600 rounded bg-slate-900 border-slate-700">
@@ -532,7 +532,7 @@
             document.getElementById('prazoFin').value=p.pf;
             document.getElementById('credito').value=p.credito;
             document.getElementById('taxaAdmAnual').value=p.adm;
-            document.getElementById('fundoReservaPct').value=p.reserva;
+            document.getElementById('fundoReservaPct').value=['imovel','auto','pesados'].includes(prod)?2.5:p.reserva;
             document.getElementById('seguroMensalPct').value=0;
             document.getElementById('jurosBanco').value=p.juros;
             document.getElementById('entradaPct').value=p.entrada;
@@ -542,6 +542,7 @@
             document.getElementById('tabelaUnifisa').style.display=['imovel','auto','pesados'].includes(prod)?'block':'none';
             document.getElementById('planoUnifisa').value='';
             atualizarTabelaUnifisa();
+            document.getElementById('ativarReduzida').checked=false;
             if(prod==='investimento'){document.getElementById('prazoConsorcio').value=240;sincronizarPrazoPatrimonial();}
             const investimento=prod==='investimento';
             document.getElementById('resEconomia').closest('.grid.grid-cols-1').style.display=investimento?'none':'grid';
@@ -585,8 +586,9 @@
             const taxaAdmPct=Math.max(0,num('taxaAdmAnual',0)); // taxa TOTAL contratual do plano
             const reservaPct=Math.max(0,num('fundoReservaPct',0));
             const seguroMensalPct=Math.max(0,num('seguroMensalPct',0));
-            const ativarRed=document.getElementById('ativarReduzida').checked;
-            const modalidade=document.getElementById('parcelaReduzida').value;
+            const planoSelecionado=tabelaPlanos[produto]?.[document.getElementById('planoUnifisa').value];
+            const ativarRed=Boolean(planoSelecionado?.reducao);
+            const modalidade=planoSelecionado?.reducao===0.5?'red50':planoSelecionado?.reducao===0.7?'red30':'nenhuma';
             const mesCont=Math.max(1,Math.min(prazoCons,Math.floor(num('mesContemplacao',1))));
             const fatorReducao=modalidade==='red50'?0.50:(modalidade==='red30'?0.70:0.75);
             const totalAdm=credito*taxaAdmPct/100;
@@ -758,7 +760,7 @@
             alphaPlus:{nome:'Alpha Plus',prazos:[200,180,160,140,120,100,80,60],adm:[20,18,18,17,16,15,14,13],antecipacao:4,mesesAntecipacao:1},
             gamma:{nome:'Gamma',prazos:[200,180,160,140,120,100,80,60],adm:[24,22,22,21,20,18,17,16],antecipacao:1,mesesAntecipacao:1},
             gamma12:{nome:'Gamma 12',prazos:[200,180,160,140,120,100,80,60],adm:[24,22,22,21,20,18,17,16],antecipacao:1,mesesAntecipacao:12,nota:'Taxas Gamma usadas como referência; confirmar condições próprias da Gamma 12.'},
-            red50:{nome:'Reduzida 50% — sem antecipação (condição informada)',prazos:[200,180,160,140],adm:[22,22,22,21],antecipacao:0,mesesAntecipacao:0,reducao:0.5,nota:'A tabela Ômega 50% do PDF registra 2% de antecipação; esta simulação usa 0% conforme condição informada. Confirmar tabela contratual.'}
+            red50:{nome:'Reduzida 50% — sem antecipação (condição informada)',prazos:[200,180,160,140],adm:[25,25,25,25],antecipacao:0,mesesAntecipacao:0,reducao:0.5,nota:'Condição comercial informada: taxa total de 25% e nenhuma antecipação. Confirmar condições da cota.'}
           },
           auto:{
             alphaPlus:{nome:'Alpha Plus',prazos:[80,70,60,50,36],adm:[15,14,13,12,11],antecipacao:4,mesesAntecipacao:1},
