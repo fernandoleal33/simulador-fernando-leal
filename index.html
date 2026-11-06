@@ -139,10 +139,8 @@
 
                     <div id="tabelaUnifisa" class="bg-slate-900/70 border border-emerald-800/50 p-4 rounded-xl space-y-2">
 <h3 class="text-sm font-semibold text-emerald-400">Tabelas comerciais Unifisa</h3>
-<p class="text-xs text-slate-400">Escolha o plano, crédito e prazo para preencher as taxas automaticamente. Os resultados são estimativas, não parcelas contratuais.</p>
-<label class="block text-xs">Plano<select id="planoUnifisa" onchange="atualizarTabelaUnifisa()" class="w-full bg-slate-900 border border-slate-600 rounded p-2"><option value="">Simulação personalizada</option><option value="alphaPlus">Alpha Plus</option><option value="gamma">Gamma</option><option value="gamma12">Gamma 12 (imóveis)</option><option value="red50">Reduzida 50% (imóveis)</option></select></label>
-<label class="block text-xs">Crédito disponível<select id="creditoUnifisa" class="w-full bg-slate-900 border border-slate-600 rounded p-2"></select></label>
-<label class="block text-xs">Prazo disponível<select id="prazoUnifisa" class="w-full bg-slate-900 border border-slate-600 rounded p-2"></select></label>
+<p class="text-xs text-slate-400">Selecione a tabela comercial. Informe o valor do crédito e o prazo nos campos abaixo; a taxa e a antecipação serão aplicadas automaticamente.</p>
+<label class="block text-xs">Plano<select id="planoUnifisa" onchange="atualizarTabelaUnifisa()" class="w-full bg-slate-900 border border-slate-600 rounded p-2"><option value="">Simulação personalizada</option></select></label>
 <div id="detalheUnifisa" class="text-xs text-emerald-200 space-y-1" aria-live="polite">Selecione um plano para consultar os valores.</div>
 <p class="text-xs text-amber-200">A antecipação integra a taxa administrativa total, não é uma taxa adicional. A redução não implica contemplação garantida. Confira as condições da cota.</p></div>
 
@@ -775,11 +773,6 @@
             gamma:{nome:'Gamma',prazos:[100,80,70,60,50,36,24],adm:[20,18,17,16,15,14,13],antecipacao:0,mesesAntecipacao:0}
           }
         };
-        const creditosTabela={
-          imovel:[400000,380000,360000,340000,320000,300000,280000,260000,240000,220000,200000,190000,180000,170000,160000,150000,140000,130000,120000,110000],
-          auto:[115000,110000,105000,100000,95000,90000,85000,80000,75000,70000,65000,60000,55000,50000,45000,40000,35000],
-          pesados:[240000,220000,210000,200000,190000,180000,170000,160000,150000,140000,130000,120000]
-        };
         function atualizarTabelaUnifisa(){
           const produto=document.getElementById('produto').value;
           const sel=document.getElementById('planoUnifisa');
@@ -789,53 +782,38 @@
           const planos=tabelaPlanos[produto]||{};
           for(const [chave,p] of Object.entries(planos)){const o=document.createElement('option');o.value=chave;o.textContent=p.nome;sel.appendChild(o);}
           if(planos[anterior])sel.value=anterior;
-          const credito=document.getElementById('creditoUnifisa'),prazo=document.getElementById('prazoUnifisa');
-          credito.replaceChildren();prazo.replaceChildren();
-          if(!sel.value){document.getElementById('detalheUnifisa').textContent='Selecione uma tabela comercial para preencher os parâmetros automaticamente.';return;}
-          const creditos=(produto==='auto'&&sel.value==='gamma30')?[300000,280000,260000,240000,220000,200000,190000,180000,170000,160000,150000,140000,130000,120000,110000,100000,90000,80000,70000]:creditosTabela[produto];
-          for(const v of creditos){const o=document.createElement('option');o.value=v;o.textContent=fmt(v);credito.appendChild(o);}
-          for(const v of planos[sel.value].prazos){const o=document.createElement('option');o.value=v;o.textContent=v+' meses';prazo.appendChild(o);}
           aplicarTabelaUnifisa();
         }
         function aplicarTabelaUnifisa(){
           const produto=document.getElementById('produto').value;
           const plano=tabelaPlanos[produto]?.[document.getElementById('planoUnifisa').value];
-          if(!plano)return;
-          const credito=Number(document.getElementById('creditoUnifisa').value);
-          const prazo=Number(document.getElementById('prazoUnifisa').value);
+          const detalhe=document.getElementById('detalheUnifisa');
+          if(!plano){detalhe.textContent='Selecione uma tabela para preencher a taxa administrativa automaticamente; crédito e prazo permanecem manuais.';return;}
+          const prazo=Math.max(1,Number(document.getElementById('prazoConsorcio').value)||1);
+          const credito=parseMoeda(document.getElementById('credito').value);
+          // Correspondência exata com o prazo comercial; não presumir taxas para prazos não tabelados.
           const i=plano.prazos.indexOf(prazo);
-          if(!credito||i<0)return;
+          if(i<0){
+            detalhe.textContent='O prazo informado não consta na tabela '+plano.nome+'. Ajuste o prazo para um prazo comercial válido; a taxa anterior não será aplicada automaticamente.';
+            document.getElementById('taxaAdmAnual').value='';
+            return;
+          }
           const adm=plano.adm[i],reserva=2.5,seguro=produto==='imovel'?0.03:0.06;
-          document.getElementById('credito').value=credito.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-          document.getElementById('prazoConsorcio').value=prazo;
           document.getElementById('taxaAdmAnual').value=adm;
           document.getElementById('fundoReservaPct').value=reserva;
           document.getElementById('seguroMensalPct').value=seguro;
-          const ativar=document.getElementById('ativarReduzida');
-          ativar.checked=Boolean(plano.reducao);
-          document.getElementById('subBlocoReduzida').style.display=plano.reducao?'block':'none';
-          if(plano.reducao){
-            const mod=document.getElementById('parcelaReduzida');mod.value=plano.reducao===0.5?'red50':'red30';
-            document.getElementById('mesContemplacao').value=Math.min(24,prazo-1);
-          }
+          document.getElementById('ativarReduzida').checked=Boolean(plano.reducao);
+          document.getElementById('subBlocoReduzida').style.display='none';
           const total=credito*(1+(adm+reserva)/100)+credito*seguro/100*prazo;
-          const base=total/prazo;
           const ant=credito*plano.antecipacao/100;
           const meses=plano.mesesAntecipacao;
           const mensal=(total-ant)/prazo;
           const comAnt=mensal+(meses?ant/meses:0);
-          const semAnt=mensal;
-          const limite=plano.reducao?Math.min(24,prazo-1):0;
-          const reduzida=plano.reducao?base*plano.reducao:0;
-          const posReducao=plano.reducao?(total-reduzida*limite)/(prazo-limite):0;
-          const detalhe=document.getElementById('detalheUnifisa');
           detalhe.replaceChildren();
           const itens=[
-            'Administração total: '+adm+'% | Antecipação: '+plano.antecipacao+'% | Reserva: '+reserva+'% | Seguro mensal estimado: '+seguro+'%',
-            meses?'Primeiras '+meses+' parcela(s), com antecipação: '+fmt(comAnt):'Sem antecipação da taxa administrativa',
-            'Parcela após antecipação: '+fmt(semAnt),
-            ...(plano.reducao?['Parcela reduzida estimada: '+fmt(reduzida)+' até o 24º mês ou contemplação, o que ocorrer primeiro','Após redução (hipótese sem contemplação): '+fmt(posReducao)]:[]),
-            'Valores ilustrativos sem reajustes; seguro simplificado sobre crédito inicial. '+(plano.nota||'Conferir regras do grupo e disponibilidade comercial.')
+            'Taxa administrativa total: '+adm+'% | Antecipação: '+plano.antecipacao+'%'+(meses?' distribuída em '+meses+' mês(es)':'')+' | Fundo de reserva: '+reserva+'%',
+            ...(credito>0?['Parcela estimada com antecipação: '+fmt(comAnt),'Parcela estimada após antecipação: '+fmt(mensal)]:[]),
+            'Valores ilustrativos, sem reajustes. '+(plano.nota||'Confirme as condições contratuais da cota.')
           ];
           for(const t of itens){const linha=document.createElement('p');linha.textContent=t;detalhe.appendChild(linha);}
           calcular();
@@ -890,7 +868,7 @@
             atualizarOpcoesReduzida();
             mudarProduto();
             // Evento de seleção configurado diretamente no campo.
-            for(const id of ['creditoUnifisa','prazoUnifisa'])document.getElementById(id).addEventListener('change',aplicarTabelaUnifisa);
+            for(const id of ['credito','prazoConsorcio'])document.getElementById(id).addEventListener('input',aplicarTabelaUnifisa);
             document.getElementById('indiceOficial').addEventListener('change',atualizarIndice);
             for(const id of ['taxaOficial','anosIndice','valorizacaoIndice'])document.getElementById(id).addEventListener('input',calcularIndice);
             document.getElementById('prazoConsorcio').addEventListener('input',sincronizarPrazoPatrimonial);
