@@ -133,7 +133,7 @@
                             <option value="embarcacao">Embarcação (Lanchas / Barcos)</option>
                             <option value="servicos">Serviços e Eletrônicos</option>
                             <option value="capital_giro">Capital de Giro (Empresarial)</option>
-                            <option value="investimento">Estratégia Patrimonial (Simulação de Custos)</option>
+                            <option value="investimento">Investimento e Construção Patrimonial</option>
                         </select>
                     </div>
 
@@ -285,7 +285,8 @@
 
             <!-- Results & Analysis Area -->
             <div class="lg:col-span-8 space-y-6">
-                <!-- Top Summary Cards -->
+                <section id="painelIndices" class="bg-slate-800/60 border border-slate-700 rounded-xl p-5 space-y-3" style="display:none"><h2 class="text-lg font-semibold">Projeção patrimonial com índices oficiais</h2><p class="text-xs text-slate-300">O reajuste da carta não é rendimento. Valorização e aluguel são hipóteses, sem garantia de retorno ou contemplação.</p><label class="block">Índice<select id="indiceOficial" class="w-full bg-slate-900 p-2"><option value="192">INCC — FGV</option><option value="433">IPCA — IBGE</option><option value="189">IGP-M — FGV</option><option value="manual">Taxa manual</option></select></label><label class="block">Taxa anual para projeção (%)<input id="taxaOficial" type="number" step="0.01" class="w-full bg-slate-900 p-2"></label><label class="block">Horizonte (anos)<input id="anosIndice" type="number" value="10" min="1" max="30" class="w-full bg-slate-900 p-2"></label><label class="block">Valorização hipotética do imóvel (% a.a.)<input id="valorizacaoIndice" type="number" value="4" step="0.1" class="w-full bg-slate-900 p-2"></label><p id="statusIndice" class="text-xs text-amber-200">Aguardando consulta...</p><button type="button" onclick="consultarIndices()" class="bg-emerald-600 rounded p-2">Atualizar índices</button><div id="resultadoIndice" class="space-y-2 text-sm"></div><p class="text-xs text-slate-400">Fonte: Banco Central/SGS. Projeção repete hipoteticamente o acumulado dos últimos 12 meses; não representa previsão ou lucro líquido. Não inclui custos contratuais, impostos ou parcelas.</p></section>
+                 <!-- Top Summary Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="bg-slate-800/60 border border-slate-700/60 p-4 rounded-xl">
                         <p id="cardTitle1" class="text-xs text-slate-400 uppercase">Economia Real com o Consórcio</p>
@@ -529,6 +530,7 @@
             document.getElementById('entradaPct').value=p.entrada;
             atualizarBancoPorProduto(prod);
             atualizarTaxaCenario();
+            document.getElementById('painelIndices').style.display=prod==='investimento'?'block':'none';
             document.getElementById('mesContemplacao').value=p.mes;
             document.getElementById('lanceLivre').value='0,00';
             document.getElementById('lanceEmbutidoPct').value=0;
@@ -557,6 +559,7 @@
             return { primeira, ultima, juros:Math.max(0,total-principal), total };
         }
         function calcular() {
+            if(document.getElementById('produto').value==='investimento'){calcularIndice();return;}
             atualizarTaxaCenario();
             const produtoEl=document.getElementById('produto');
             const produto=produtoEl.value;
@@ -663,6 +666,7 @@
             window.__simulacaoAtual={taxaEstimada:document.getElementById('ajustarTaxaCenario').checked && (produto==='imovel' || produto==='auto') && bancoSelecionado!=='Personalizar taxa',produto:produtoEl.options[produtoEl.selectedIndex].text,credito,prazoCons,prazoFin,mesCont,parcelaPre,parcelaPos,lanceLivre:lanceProprioAplicado,lanceEmbutido:embutidoAplicado,creditoLiquido,desembolsoCons,custoFin,diferenca,juros:fin.juros,entrada:valorEntrada,sistema,banco:bancoSelecionado,taxaAnual:jurosAA};
         }
         function textoProposta() {
+            if(document.getElementById('produto').value==='investimento')return window.propostaIndice||'Calcule a projeção patrimonial antes de compartilhar.';
             const s=window.__simulacaoAtual;
             if (!s) return 'Faça uma simulação antes de compartilhar.';
             return `📊 *Simulação ilustrativa — Consórcio x Financiamento*\nConsultor: ${consultorAtual.nome}\n\n• Segmento: ${s.produto}\n• Crédito de referência: ${fmt(s.credito)}\n• Crédito líquido no consórcio após lance embutido: ${fmt(s.creditoLiquido)}\n• Contemplação considerada apenas como hipótese: mês ${s.mesCont}\n• Parcela pré-contemplação: ${fmt(s.parcelaPre)}\n• Parcela pós-contemplação estimada: ${fmt(s.parcelaPos)}\n• Lance próprio aplicado: ${fmt(s.lanceLivre)}\n• Lance embutido aplicado: ${fmt(s.lanceEmbutido)}\n• Desembolso estimado no consórcio: ${fmt(s.desembolsoCons)}\n• Entrada no financiamento: ${fmt(s.entrada)}\n• Banco / referência: ${s.banco}\n• Taxa efetiva anual ${s.taxaEstimada ? "estimada (cenário ilustrativo)" : "informada"}: ${s.taxaAnual.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}% a.a.\n• Juros estimados do financiamento: ${fmt(s.juros)}\n• Desembolso estimado no financiamento: ${fmt(s.custoFin)}\n\nValores nominais e ilustrativos. Ajustes automáticos de taxa por entrada e prazo são hipóteses de sensibilidade, não regras dos bancos ou ofertas aprovadas. Não incluem necessariamente reajustes, seguros, tarifas, tributos ou custos previstos em contrato. A contemplação não é garantida no mês indicado.\n\n📲 ${consultorAtual.nome} — ${consultorAtual.formatado}`;
@@ -677,6 +681,49 @@
             catch(e) { window.prompt('Copie a proposta abaixo:',txt); }
         }
         
+
+        const historicoIndices={};
+        async function consultarIndices(){
+          document.getElementById('statusIndice').textContent='Consultando dados oficiais...';
+          const codigos=['192','433','189'];
+          const resultados=await Promise.allSettled(codigos.map(async codigo=>{
+            const r=await fetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.'+codigo+'/dados/ultimos/12?formato=json',{cache:'no-store'});
+            if(!r.ok)throw Error('Falha de consulta');
+            const pontos=await r.json();
+            if(!Array.isArray(pontos)||pontos.length!==12)throw Error('Dados incompletos');
+            const anual=(pontos.reduce((a,p)=>a*(1+Number(p.valor)/100),1)-1)*100;
+            if(!Number.isFinite(anual))throw Error('Taxa inválida');
+            return {anual,data:pontos[11].data};
+          }));
+          resultados.forEach((r,i)=>{if(r.status==='fulfilled')historicoIndices[codigos[i]]=r.value;else delete historicoIndices[codigos[i]];});
+          atualizarIndice();
+        }
+        function atualizarIndice(){
+          const codigo=document.getElementById('indiceOficial').value;
+          const dado=historicoIndices[codigo];
+          const campo=document.getElementById('taxaOficial');
+          campo.readOnly=!!dado;
+          campo.value=dado?dado.anual.toFixed(2):'';
+          document.getElementById('statusIndice').textContent=dado?'Acumulado oficial dos últimos 12 meses: '+dado.anual.toFixed(2)+'%; competência mais recente: '+dado.data+'.':codigo==='manual'?'Taxa manual, não oficial.':'Consulta indisponível para este índice. Selecione Manual para usar uma hipótese.';
+          calcularIndice();
+        }
+        function calcularIndice(){
+          const out=document.getElementById('resultadoIndice');
+          const raw=document.getElementById('taxaOficial').value;
+          const taxa=raw===''?NaN:Number(raw);
+          const valor=parseMoeda(document.getElementById('credito').value);
+          const anos=Math.max(1,Math.min(30,num('anosIndice',10)));
+          const valorizacao=num('valorizacaoIndice',4);
+          if(!Number.isFinite(taxa)||taxa<=-100||valorizacao<=-100||valor<=0){out.textContent='Aguardando índice oficial ou taxa manual válida.';window.propostaIndice='';return;}
+          const credito=valor*Math.pow(1+taxa/100,anos);
+          const imovel=valor*Math.pow(1+valorizacao/100,anos);
+          out.replaceChildren();
+          for(const [rotulo,quantia] of [['Carta inicial',valor],['Carta corrigida (hipótese)',credito],['Valor projetado do imóvel',imovel],['Valorização nominal hipotética do imóvel',imovel-valor]]){
+            const p=document.createElement('p');p.textContent=rotulo+': '+fmt(quantia);out.appendChild(p);
+          }
+          const aviso=document.createElement('p');aviso.textContent='A valorização não é rendimento do consórcio. Não há lucro líquido calculado: custos, parcelas e obrigações não foram deduzidos.';out.appendChild(aviso);
+          window.propostaIndice='Projeção patrimonial ilustrativa\\nConsultor: '+consultorAtual.nome+'\\nCarta inicial: '+fmt(valor)+'\\nCarta corrigida: '+fmt(credito)+'\\nImóvel projetado: '+fmt(imovel)+'\\nNão representa lucro líquido nem retorno garantido.';
+        }
         const consultorPadrao = {nome:'Fernando Leal',numero:'5511947662843'};
         let consultorAtual = { ...consultorPadrao,formatado:'(11) 94766-2843'};
         function validarConsultor(nome, telefone) {
@@ -726,6 +773,9 @@
             aplicarConsultor();
             atualizarOpcoesReduzida();
             mudarProduto();
+            document.getElementById('indiceOficial').addEventListener('change',atualizarIndice);
+            for(const id of ['taxaOficial','anosIndice','valorizacaoIndice'])document.getElementById(id).addEventListener('input',calcularIndice);
+            consultarIndices();
             document.getElementById('entradaPct').addEventListener('input', calcular);
             document.getElementById('prazoFin').addEventListener('input', calcular);
             document.getElementById('ajustarTaxaCenario').addEventListener('change', calcular);
