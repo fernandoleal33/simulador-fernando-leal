@@ -261,8 +261,11 @@
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Taxa efetiva anual do financiamento (%)</label>
-                            <input type="number" id="jurosBanco" value="7.98" min="0" step="0.01" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                            <input type="number" id="jurosBanco" value="7.98" min="0" max="100" step="0.01" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
                             <p class="text-[10px] text-slate-400 mt-0.5" id="txtTipoFinanciamento">Taxa de referência editável. O CET pode incluir TR, seguros, tarifas e outros encargos.</p>
+                            <label class="flex items-start gap-2 text-xs text-slate-200 mt-3"><input type="checkbox" id="ajustarTaxaCenario" checked class="mt-0.5"> Ajustar taxa automaticamente por entrada e prazo (cenário ilustrativo, não cotação bancária)</label>
+                            <p id="explicacaoTaxaCenario" class="text-xs text-amber-200 mt-2" role="status" aria-live="polite">Ajuste estimado. Confirme condições, elegibilidade e CET com o banco.</p>
+                            <p class="text-[10px] text-slate-400 mt-1">Desmarque para informar uma taxa efetiva anual obtida em proposta real. Os ajustes não representam regras oficiais dos bancos.</p>
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Sistema de amortização</label>
@@ -419,18 +422,49 @@
             sicoob: 10.01,
             sicredi: 10.50
         };
+        let taxaBaseSelecionada = null;
+        // Modelo de sensibilidade hipotético: não representa precificação de qualquer instituição.
+        // Referência neutra: imóvel 20% de entrada e 360 meses; automóvel 30% e 60 meses.
+        function ajustarTaxaPorCenario(produto, entradaPct, meses) {
+            const referencia = produto === 'imovel' ? {entrada:20, prazo:360} : {entrada:30, prazo:60};
+            const diferencaEntrada = (referencia.entrada - entradaPct) * 0.04;
+            const diferencaPrazo = (meses - referencia.prazo) / 12 * (produto === 'imovel' ? 0.08 : 0.35);
+            return Math.max(-3, Math.min(3, diferencaEntrada + diferencaPrazo));
+        }
+        function atualizarTaxaCenario() {
+            const produto = document.getElementById('produto').value;
+            const banco = produto === 'imovel' ? document.getElementById('bancoFin').value : produto === 'auto' ? document.getElementById('bancoAuto').value : 'manual';
+            const ativo = document.getElementById('ajustarTaxaCenario').checked && banco !== 'manual' && (produto === 'imovel' || produto === 'auto');
+            const campo = document.getElementById('jurosBanco');
+            const nota = document.getElementById('explicacaoTaxaCenario');
+            if (!ativo) {
+                nota.textContent = 'Taxa informada manualmente ou produto sem modelo automático. Confirme taxa efetiva e CET.';
+                return;
+            }
+            const entrada = Math.max(0, Math.min(100, num('entradaPct',0)));
+            const meses = Math.max(1, num('prazoFin',1));
+            const base = produto === 'imovel' ? taxasBancosImobiliario[banco] : taxasBancosAuto[banco];
+            const ajuste = ajustarTaxaPorCenario(produto,entrada,meses);
+            const taxa = Math.max(0,base+ajuste);
+            taxaBaseSelecionada = base;
+            campo.value = taxa.toFixed(2);
+            nota.textContent = 'Estimativa ilustrativa: referência '+base.toFixed(2)+'% a.a. '+(ajuste>=0?'+ ':'− ')+Math.abs(ajuste).toFixed(2)+' p.p. por entrada/prazo = '+taxa.toFixed(2)+'% a.a. Não é oferta, política oficial ou CET.';
+        }
         function selecionarBanco() {
             const banco = document.getElementById('bancoFin').value;
             const campo = document.getElementById('jurosBanco');
             const nota = document.getElementById('notaBanco');
             if (banco === 'manual') {
+                document.getElementById('ajustarTaxaCenario').checked = false;
                 campo.readOnly = false;
                 nota.textContent = 'Taxa personalizada inserida manualmente. Confirme a taxa e o CET na proposta bancária.';
             } else {
                 campo.value = taxasBancosImobiliario[banco].toFixed(2);
+                taxaBaseSelecionada = taxasBancosImobiliario[banco];
                 campo.readOnly = false; // permite ajuste fino conforme perfil e proposta
                 nota.textContent = 'Referência BCB: setembro/2026, PF, imobiliário regulado com TR. Valor editável; não representa taxa aprovada nem CET.';
             }
+            atualizarTaxaCenario();
             calcular();
         }
         // Valores iniciais ilustrativos para comparação, não cotações oficiais ou atuais.
@@ -447,11 +481,14 @@
             const campo = document.getElementById('jurosBanco');
             const nota = document.getElementById('notaBancoAuto');
             if (banco === 'manual') {
+                document.getElementById('ajustarTaxaCenario').checked = false;
                 nota.textContent = 'Taxa personalizada. Confirme taxa efetiva anual e CET na proposta bancária.';
             } else {
                 campo.value = taxasBancosAuto[banco].toFixed(2);
+                taxaBaseSelecionada = taxasBancosAuto[banco];
                 nota.textContent = 'Referência ilustrativa editável, não taxa vigente ou aprovada. Verifique condições e CET com o banco.';
             }
+            atualizarTaxaCenario();
             calcular();
         }
         function atualizarBancoPorProduto(prod) {
@@ -489,8 +526,9 @@
             document.getElementById('fundoReservaPct').value=p.reserva;
             document.getElementById('seguroMensalPct').value=0;
             document.getElementById('jurosBanco').value=p.juros;
-            atualizarBancoPorProduto(prod);
             document.getElementById('entradaPct').value=p.entrada;
+            atualizarBancoPorProduto(prod);
+            atualizarTaxaCenario();
             document.getElementById('mesContemplacao').value=p.mes;
             document.getElementById('lanceLivre').value='0,00';
             document.getElementById('lanceEmbutidoPct').value=0;
@@ -519,6 +557,7 @@
             return { primeira, ultima, juros:Math.max(0,total-principal), total };
         }
         function calcular() {
+            atualizarTaxaCenario();
             const produtoEl=document.getElementById('produto');
             const produto=produtoEl.value;
             const credito=parseMoeda(document.getElementById('credito').value);
@@ -621,12 +660,12 @@
             // Mantém a área antiga de investimento oculta: projeções de valorização/aluguel não são retorno garantido.
             document.getElementById('blocoExplicacaoInvestimento').style.display='none';
             const bancoSelecionado = produto === 'imovel' ? document.getElementById('bancoFin').selectedOptions[0].text : produto === 'auto' ? document.getElementById('bancoAuto').selectedOptions[0].text : 'Taxa personalizada';
-            window.__simulacaoAtual={produto:produtoEl.options[produtoEl.selectedIndex].text,credito,prazoCons,prazoFin,mesCont,parcelaPre,parcelaPos,lanceLivre:lanceProprioAplicado,lanceEmbutido:embutidoAplicado,creditoLiquido,desembolsoCons,custoFin,diferenca,juros:fin.juros,entrada:valorEntrada,sistema,banco:bancoSelecionado,taxaAnual:jurosAA};
+            window.__simulacaoAtual={taxaEstimada:document.getElementById('ajustarTaxaCenario').checked && (produto==='imovel' || produto==='auto') && bancoSelecionado!=='Personalizar taxa',produto:produtoEl.options[produtoEl.selectedIndex].text,credito,prazoCons,prazoFin,mesCont,parcelaPre,parcelaPos,lanceLivre:lanceProprioAplicado,lanceEmbutido:embutidoAplicado,creditoLiquido,desembolsoCons,custoFin,diferenca,juros:fin.juros,entrada:valorEntrada,sistema,banco:bancoSelecionado,taxaAnual:jurosAA};
         }
         function textoProposta() {
             const s=window.__simulacaoAtual;
             if (!s) return 'Faça uma simulação antes de compartilhar.';
-            return `📊 *Simulação ilustrativa — Consórcio x Financiamento*\nConsultor: ${consultorAtual.nome}\n\n• Segmento: ${s.produto}\n• Crédito de referência: ${fmt(s.credito)}\n• Crédito líquido no consórcio após lance embutido: ${fmt(s.creditoLiquido)}\n• Contemplação considerada apenas como hipótese: mês ${s.mesCont}\n• Parcela pré-contemplação: ${fmt(s.parcelaPre)}\n• Parcela pós-contemplação estimada: ${fmt(s.parcelaPos)}\n• Lance próprio aplicado: ${fmt(s.lanceLivre)}\n• Lance embutido aplicado: ${fmt(s.lanceEmbutido)}\n• Desembolso estimado no consórcio: ${fmt(s.desembolsoCons)}\n• Entrada no financiamento: ${fmt(s.entrada)}\n• Banco / referência: ${s.banco}\n• Taxa efetiva anual informada: ${s.taxaAnual.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}% a.a.\n• Juros estimados do financiamento: ${fmt(s.juros)}\n• Desembolso estimado no financiamento: ${fmt(s.custoFin)}\n\nValores nominais e ilustrativos. Não incluem necessariamente reajustes, seguros, tarifas, tributos ou custos previstos em contrato. A contemplação não é garantida no mês indicado.\n\n📲 ${consultorAtual.nome} — ${consultorAtual.formatado}`;
+            return `📊 *Simulação ilustrativa — Consórcio x Financiamento*\nConsultor: ${consultorAtual.nome}\n\n• Segmento: ${s.produto}\n• Crédito de referência: ${fmt(s.credito)}\n• Crédito líquido no consórcio após lance embutido: ${fmt(s.creditoLiquido)}\n• Contemplação considerada apenas como hipótese: mês ${s.mesCont}\n• Parcela pré-contemplação: ${fmt(s.parcelaPre)}\n• Parcela pós-contemplação estimada: ${fmt(s.parcelaPos)}\n• Lance próprio aplicado: ${fmt(s.lanceLivre)}\n• Lance embutido aplicado: ${fmt(s.lanceEmbutido)}\n• Desembolso estimado no consórcio: ${fmt(s.desembolsoCons)}\n• Entrada no financiamento: ${fmt(s.entrada)}\n• Banco / referência: ${s.banco}\n• Taxa efetiva anual ${s.taxaEstimada ? "estimada (cenário ilustrativo)" : "informada"}: ${s.taxaAnual.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}% a.a.\n• Juros estimados do financiamento: ${fmt(s.juros)}\n• Desembolso estimado no financiamento: ${fmt(s.custoFin)}\n\nValores nominais e ilustrativos. Ajustes automáticos de taxa por entrada e prazo são hipóteses de sensibilidade, não regras dos bancos ou ofertas aprovadas. Não incluem necessariamente reajustes, seguros, tarifas, tributos ou custos previstos em contrato. A contemplação não é garantida no mês indicado.\n\n📲 ${consultorAtual.nome} — ${consultorAtual.formatado}`;
         }
         function enviarWhatsApp() {
             const url='https://wa.me/'+consultorAtual.numero+'?text='+encodeURIComponent(textoProposta());
@@ -683,7 +722,18 @@
           document.getElementById('telefoneGerador').value=d.formatado;
           gerarLinkConsultor();
         }
-        window.onload = () => { aplicarConsultor(); atualizarOpcoesReduzida(); mudarProduto(); };
+        window.onload = () => {
+            aplicarConsultor();
+            atualizarOpcoesReduzida();
+            mudarProduto();
+            document.getElementById('entradaPct').addEventListener('input', calcular);
+            document.getElementById('prazoFin').addEventListener('input', calcular);
+            document.getElementById('ajustarTaxaCenario').addEventListener('change', calcular);
+            document.getElementById('jurosBanco').addEventListener('input', () => {
+                document.getElementById('ajustarTaxaCenario').checked = false;
+                calcular();
+            });
+        };
 
     </script>
 
