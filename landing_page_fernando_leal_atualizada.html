@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fernando Leal | Personal Banker Unifisa — Planejamento e Consórcio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+
+<style>
+  :root { --navy:#071a33; --navy2:#0d2b50; --gold:#f4c542; --ink:#14243a; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; }
+  .fl-site { font-family:Inter,Arial,sans-serif; color:#eaf1fa; background:#071a33; }
+  .fl-nav { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:16px clamp(18px,5vw,72px); background:#06152a; border-bottom:1px solid #1e3858; }
+  .fl-brand { font-weight:800; letter-spacing:.02em; color:white; }
+  .fl-brand span { color:var(--gold); }
+  .fl-nav a { color:#dbe7f5; text-decoration:none; font-size:13px; font-weight:600; }
+  .fl-navlinks { display:flex; flex-wrap:wrap; gap:22px; align-items:center; }
+  .fl-cta { display:inline-block; background:var(--gold); color:#10233c!important; padding:12px 18px; border-radius:9px; font-weight:800!important; text-decoration:none; }
+  .fl-hero { padding:70px clamp(20px,7vw,100px) 64px; background:radial-gradient(circle at 80% 15%,#1d4773 0,transparent 34%),linear-gradient(125deg,#071a33,#0c2e55); }
+  .fl-hero-inner { max-width:1180px; margin:auto; display:grid; grid-template-columns:1.25fr .75fr; gap:40px; align-items:center; }
+  .fl-eyebrow { display:inline-block; color:var(--gold); font-size:12px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; margin-bottom:18px; }
+  .fl-hero h1 { color:white; font-size:clamp(34px,5vw,60px); line-height:1.04; margin:0 0 20px; letter-spacing:-.04em; }
+  .fl-hero h1 em { color:var(--gold); font-style:normal; }
+  .fl-hero p { max-width:650px; color:#c6d5e7; font-size:17px; line-height:1.7; margin:0 0 28px; }
+  .fl-hero-card { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); border-radius:20px; padding:26px; box-shadow:0 22px 55px rgba(0,0,0,.2); }
+  .fl-hero-card strong { display:block; color:var(--gold); font-size:14px; margin-bottom:12px; }
+  .fl-hero-card ul { margin:0; padding-left:19px; color:#e4edf8; line-height:2; font-size:14px; }
+  .fl-section { max-width:1180px; margin:auto; padding:58px 22px; }
+  .fl-section h2 { color:white; font-size:clamp(25px,3vw,36px); margin:0 0 12px; }
+  .fl-lead { color:#b8c9dc; line-height:1.7; margin:0 0 28px; max-width:760px; }
+  .fl-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:15px; }
+  .fl-tile { border:1px solid #294564; background:#0c2543; padding:21px; border-radius:15px; }
+  .fl-tile b { display:block; color:#fff; margin-bottom:7px; }
+  .fl-tile span { color:#b9cbe0; font-size:13px; line-height:1.55; }
+  .fl-simulator-intro { max-width:1180px; margin:0 auto; padding:35px 22px 8px; }
+  .fl-simulator-intro h2 { color:#fff; font-size:clamp(26px,3vw,38px); margin:0 0 10px; }
+  .fl-simulator-intro p { color:#b8c9dc; line-height:1.6; margin:0; }
+  .fl-disclaimer { max-width:1180px; margin:20px auto 35px; padding:0 22px; color:#9fb2c9; font-size:11px; line-height:1.6; }
+  .fl-footer { padding:28px 20px; text-align:center; color:#aebfd3; background:#041225; border-top:1px solid #1e3858; font-size:12px; line-height:1.7; }
+  @media(max-width:800px) {
+    .fl-hero-inner { grid-template-columns:1fr; }
+    .fl-nav { align-items:flex-start; flex-direction:column; }
+    .fl-navlinks { gap:13px; }
+    .fl-grid { grid-template-columns:1fr; }
+    .fl-hero { padding-top:48px; }
+  }
+</style>
+<div class="fl-site">
+  <nav class="fl-nav">
+    <div class="fl-brand">FERNANDO LEAL <span>| PERSONAL BANKER</span></div>
+    <div class="fl-navlinks">
+      <a href="#solucoes">Soluções</a>
+      <a href="#simulador">Simulador</a>
+      <a class="fl-cta" href="https://wa.me/5511947662843?text=Olá%2C%20Fernando!%20Gostaria%20de%20conversar%20sobre%20planejamento%20com%20consórcio." target="_blank" rel="noopener">Falar no WhatsApp</a>
+    </div>
+  </nav>
+  <section class="fl-hero">
+    <div class="fl-hero-inner">
+      <div>
+        <span class="fl-eyebrow">Planejamento financeiro e patrimonial</span>
+        <h1>Seu próximo passo patrimonial começa com <em>planejamento.</em></h1>
+        <p>Estratégias de consórcio para aquisição de imóveis, veículos e ativos, expansão de negócios e organização de projetos de curto, médio e longo prazo.</p>
+        <a class="fl-cta" href="#simulador">Faça uma simulação</a>
+      </div>
+      <div class="fl-hero-card">
+        <strong>ATENDIMENTO CONSULTIVO</strong>
+        <ul>
+          <li>Planejamento de aquisição de bens</li>
+          <li>Alternativas para pessoa física e empresas</li>
+          <li>Comparativo entre consórcio e financiamento</li>
+          <li>Análise de cenários conforme seu objetivo</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  <section class="fl-section" id="solucoes">
+    <h2>Uma estratégia para cada projeto</h2>
+    <p class="fl-lead">Conheça algumas possibilidades e converse comigo para avaliar regras, custos, prazos e condições adequadas ao seu planejamento.</p>
+    <div class="fl-grid">
+      <div class="fl-tile"><b>Imóveis</b><span>Imóveis prontos ou na planta, terrenos, construção e reforma.</span></div>
+      <div class="fl-tile"><b>Veículos e mobilidade</b><span>Carros, motos, caminhões, ônibus e renovação de frota.</span></div>
+      <div class="fl-tile"><b>Náutico e equipamentos</b><span>Embarcações, máquinas, equipamentos e outros ativos elegíveis.</span></div>
+      <div class="fl-tile"><b>Agro e empresarial</b><span>Planejamento para aquisição de ativos e expansão de operações.</span></div>
+      <div class="fl-tile"><b>Capital e patrimônio</b><span>Estudo de alternativas de crédito conforme as regras do produto.</span></div>
+      <div class="fl-tile"><b>Comparativo financeiro</b><span>Visualize cenários de consórcio e financiamento com premissas editáveis.</span></div>
+    </div>
+  </section>
+  <div class="fl-simulator-intro" id="simulador">
+    <h2>Simulador estratégico</h2>
+    <p>Compare cenários de consórcio e financiamento. Ajuste os valores e as premissas para iniciar uma conversa consultiva.</p>
+  </div>
+</div>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-8 border-b border-slate-800 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <span class="bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Fernando Leal • Consultoria & Vendas</span>
+                <h1 class="text-2xl md:text-3xl font-bold text-white mt-2">Simulador Estratégico: Consórcio vs Financiamento</h1>
+                <p class="text-slate-400 text-sm mt-1">Diferenciação clara entre Entrada Bancária Obrigatória e Lance/Antecipação no Consórcio.</p>
+            </div>
+            <div class="bg-slate-800 border border-slate-700 p-3 rounded-xl flex items-center gap-3">
+                <div>
+                    <p class="text-xs text-slate-400">Atendimento WhatsApp</p>
+                    <p class="text-sm font-semibold text-emerald-400">(11) 94766-2843</p>
+                </div>
+                <a href="https://wa.me/5511947662843?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20consórcio." target="_blank" rel="noopener" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition">WhatsApp</a>
+            </div>
+        </header>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Sidebar / Inputs -->
+            <div class="lg:col-span-4 bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5 space-y-5">
+                <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                    Configuração da Simulação
+                </h2>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Segmento / Produto</label>
+                        <select id="produto" onchange="mudarProduto()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                            <option value="imovel">Imóvel (Residencial / Comercial / Planta)</option>
+                            <option value="auto">Automóvel Leve</option>
+                            <option value="moto">Moto</option>
+                            <option value="pesados">Pesados (Caminhões, Tratores, Silos)</option>
+                            <option value="embarcacao">Embarcação (Lanchas / Barcos)</option>
+                            <option value="servicos">Serviços e Eletrônicos</option>
+                            <option value="capital_giro">Capital de Giro (Empresarial)</option>
+                            <option value="investimento">Estratégia Patrimonial (Simulação de Custos)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Valor do Crédito / Bem (R$)</label>
+                        <input type="text" id="credito" value="300.000,00" oninput="mascaraMoeda(this)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+
+                    <!-- Prazos Independentes -->
+                    <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-700">
+                        <div>
+                            <label class="block text-xs font-medium text-emerald-400 mb-1">Prazo Consórcio (Meses)</label>
+                            <input type="number" id="prazoConsorcio" value="200" min="1" max="300" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-red-400 mb-1">Prazo Financiamento (Meses)</label>
+                            <input type="number" id="prazoFin" value="360" min="1" max="420" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Taxa de Administração Total do Plano (%)</label>
+                        <input type="number" id="taxaAdmAnual" value="20" min="0" max="100" step="0.1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Fundo de reserva total (%)</label>
+                            <input type="number" id="fundoReservaPct" value="2" min="0" max="20" step="0.1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Seguro mensal (% do crédito)</label>
+                            <input type="number" id="seguroMensalPct" value="0" min="0" max="2" step="0.01" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-slate-400">Informe os percentuais totais e o seguro previstos na proposta/contrato. Não confunda taxa anual divulgada com taxa total do plano. Os valores iniciais são apenas exemplos editáveis, não taxas oficiais da administradora.</p>
+
+                    <!-- Parcela Reduzida Optativa -->
+                    <div id="blocoParcelaReduzida" class="pt-2 border-t border-slate-700 space-y-2">
+                        <label class="flex items-center justify-between cursor-pointer">
+                            <span class="text-xs font-semibold text-emerald-400">Ativar Parcela Reduzida (Opcional)</span>
+                            <input type="checkbox" id="ativarReduzida" onchange="toggleReduzida()" class="w-4 h-4 text-emerald-600 rounded bg-slate-900 border-slate-700">
+                        </label>
+                        <div id="subBlocoReduzida" style="display:none;" class="mt-2">
+                            <select id="parcelaReduzida" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-xs">
+                                <!-- Populated dynamically -->
+                            </select>
+                            <p class="text-[10px] text-slate-400 mt-1">Paga valor reduzido até a contemplação. Após, retorna ao normal.</p>
+                        </div>
+                    </div>
+
+                    <div id="blocoInvestimentoConfig" class="pt-2 border-t border-slate-700 space-y-3" style="display:none;">
+                        <h3 class="text-xs font-semibold text-teal-400 uppercase">Parâmetros de Rendimento do Investimento</h3>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Taxa de Inflação / Correção Anual do Bem (% a.a.)</label>
+                            <input type="number" id="inflacaoBem" value="5,5" step="0.5" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Rendimento / Retorno Anual Pós-Contemplação (% a.a.)</label>
+                            <input type="number" id="rendimentoAnual" value="8,5" step="0.5" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                            <p class="text-[10px] text-slate-400 mt-0.5">Ex: Aluguel de imóvel ou reinvestimento produtivo</p>
+                        </div>
+                    </div>
+
+                    <!-- Contemplation & Lances Section -->
+                    <div class="pt-2 border-t border-slate-700 space-y-3">
+                        <h3 class="text-xs font-semibold text-emerald-400 uppercase">Simulação de Contemplação & Lances (Consórcio)</h3>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Prazo Estimado para Contemplação (Mês)</label>
+                            <input type="number" id="mesContemplacao" value="12" min="1" max="300" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Lance Livre (Recurso Próprio em R$)</label>
+                            <input type="text" id="lanceLivre" value="0,00" oninput="mascaraMoeda(this)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                            <p class="text-[10px] text-slate-400 mt-0.5">Dinheiro do bolso usado para antecipar e amortizar saldo devedor.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Lance Embutido (% sobre o crédito)</label>
+                            <input type="number" id="lanceEmbutidoPct" value="0" max="30" step="1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                            <p class="text-[10px] text-slate-400 mt-0.5" id="valLanceEmbutidoText">Valor: R$ 0,00</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Como abater o lance contemplado?</label>
+                            <select id="tipoAbatimento" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                                <option value="prazo">Reduzir o Prazo (Mantém a parcela)</option>
+                                <option value="parcela">Reduzir o Valor da Parcela (Mantém o prazo)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Financiamento Bancário Section -->
+                    <div class="pt-2 border-t border-slate-700 space-y-3">
+                        <h3 class="text-xs font-semibold text-red-400 uppercase">Parâmetros de Financiamento Bancário</h3>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Valor de Entrada Obrigatória no Banco (% do Bem)</label>
+                            <input type="number" id="entradaPct" value="20" min="0" max="80" step="5" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                            <p class="text-[10px] text-slate-400 mt-0.5" id="valEntradaText">Valor de Entrada: R$ 0,00 (Exigido pelo banco para aprovar)</p>
+                        </div>
+                        <div id="blocoBancoImovel">
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Banco / referência de taxa imobiliária</label>
+                            <select id="bancoFin" onchange="selecionarBanco()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                                <option value="caixa">Caixa Econômica Federal</option>
+                                <option value="bradesco">Bradesco</option>
+                                <option value="santander">Santander</option>
+                                <option value="itau">Itaú</option>
+                                <option value="bb">Banco do Brasil</option>
+                                <option value="inter">Banco Inter</option>
+                                <option value="sicoob">Sicoob</option>
+                                <option value="sicredi">Sicredi</option>
+                                <option value="manual">Personalizar taxa</option>
+                            </select>
+                            <p class="text-[10px] text-slate-400 mt-1" id="notaBanco">Referência BCB: financiamento imobiliário PF, taxas reguladas pós-fixadas pela TR, setembro/2026. Não é proposta ou taxa garantida.</p>
+                        </div>
+                        <div id="blocoBancoAuto" style="display:none;">
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Banco / referência de taxa para automóveis</label>
+                            <select id="bancoAuto" onchange="selecionarBancoAuto()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                                <option value="santander">Santander</option>
+                                <option value="itau">Itaú</option>
+                                <option value="pan">Banco PAN</option>
+                                <option value="bv">BV</option>
+                                <option value="bradesco">Bradesco</option>
+                                <option value="manual">Personalizar taxa</option>
+                            </select>
+                            <p id="notaBancoAuto" class="text-[10px] text-slate-400 mt-1">Taxas anuais ilustrativas e editáveis, não ofertas bancárias. Confirme a taxa efetiva e o CET da proposta.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Taxa efetiva anual do financiamento (%)</label>
+                            <input type="number" id="jurosBanco" value="7.98" min="0" step="0.01" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                            <p class="text-[10px] text-slate-400 mt-0.5" id="txtTipoFinanciamento">Taxa de referência editável. O CET pode incluir TR, seguros, tarifas e outros encargos.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Sistema de amortização</label>
+                            <select id="sistemaFin" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                                <option value="price">Tabela Price</option>
+                                <option value="sac">SAC</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Botão de Calcular Explícito -->
+                    <button onclick="calcular()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-emerald-950 mt-4">
+                        Calcular Simulação Completa
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results & Analysis Area -->
+            <div class="lg:col-span-8 space-y-6">
+                <!-- Top Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-4 rounded-xl">
+                        <p id="cardTitle1" class="text-xs text-slate-400 uppercase">Economia Real com o Consórcio</p>
+                        <h3 id="resEconomia" class="text-xl font-bold text-emerald-400 mt-1">R$ 0,00</h3>
+                    </div>
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-4 rounded-xl">
+                        <p id="cardTitle2" class="text-xs text-slate-400 uppercase">Crédito Efetivo / Líquido</p>
+                        <h3 id="resRendimentoTotal" class="text-xl font-bold text-teal-400 mt-1">R$ 0,00</h3>
+                    </div>
+                    <div class="bg-slate-800/60 border border-slate-700/60 p-4 rounded-xl">
+                        <p id="cardTitle3" class="text-xs text-slate-400 uppercase">Impacto do Lance (Abatimento)</p>
+                        <h3 id="resPatrimonioFinal" class="text-xl font-bold text-blue-400 mt-1">0</h3>
+                    </div>
+                </div>
+
+                <!-- Detailed Breakdown Box -->
+                <div class="bg-slate-800/60 border border-slate-700/60 p-5 rounded-2xl">
+                    <h3 class="text-sm font-semibold text-white mb-3">Detalhamento Financeiro: Consórcio vs Financiamento</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <p class="text-emerald-400 font-semibold text-xs uppercase mb-2">Consórcio (Sem Entrada Obrigatória)</p>
+                            <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400" id="labelParcPre">Parcela Pré-Contemplação:</span> <strong id="valParcRed">R$ 0</strong></div>
+                            <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Parcela Pós-Contemplação:</span> <strong id="valParcPos" class="text-emerald-400">R$ 0</strong></div>
+                            <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Lance com recurso próprio:</span> <strong id="valLanceProprio" class="text-white">R$ 0</strong></div>
+                            <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Crédito líquido disponível:</span> <strong id="valCreditoLiquido" class="text-white">R$ 0</strong></div>
+                            <div class="flex justify-between py-1 pt-1"><span class="text-slate-400">Desembolso estimado:</span> <strong id="valCustoConsorcio" class="text-white">R$ 0</strong></div>
+                        </div>
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <p class="text-red-400 font-semibold text-xs uppercase mb-2" id="divSubTituloFin">Financiamento Bancário (Com Entrada)</p>
+                            <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Valor de Entrada Exigido:</span> <strong id="valEntradaFin">R$ 0</strong></div>
+                            <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Parcela inicial:</span> <strong id="valParcBanco">R$ 0</strong></div>
+                            <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Última parcela (estimada):</span> <strong id="valUltParcBanco">R$ 0</strong></div>
+                            <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Total de juros:</span> <strong id="valJurosBanco" class="text-red-400">R$ 0</strong></div>
+                            <div class="flex justify-between py-1 pt-1"><span class="text-slate-400">Custo Total (Entrada + Parcelas):</span> <strong id="valCustoBanco" class="text-white">R$ 0</strong></div>
+                        </div>
+                    </div>
+                    <div class="mt-4 bg-emerald-950/30 border border-emerald-800/50 p-4 rounded-xl text-xs text-emerald-300 leading-relaxed" id="textoDiferencas">
+                        <strong>Resumo da Diferença:</strong> O comparativo demonstra a economia expressiva ao optar pelo consórcio em vez de financiar no banco.
+                    </div>
+                </div>
+
+                <!-- Investment Yield Explanation Box -->
+                <div id="blocoExplicacaoInvestimento" class="bg-slate-800/60 border border-slate-700/60 p-5 rounded-2xl space-y-3" style="display:none;">
+                    <h3 class="text-sm font-semibold text-teal-400 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        Relatório de Rendimentos e Correção do Consórcio (Investimento)
+                    </h3>
+                    <p id="textoRelatorioInvestimento" class="text-xs text-slate-300 leading-relaxed">
+                        Projeção de aluguel e valorização patrimonial.
+                    </p>
+                </div>
+
+                <!-- Action Buttons for WhatsApp & Testing -->
+                <div class="bg-slate-800/60 border border-slate-700/60 p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div>
+                        <h4 class="text-sm font-semibold text-white">Testar Envio via WhatsApp</h4>
+                        <p class="text-xs text-slate-400">Clique ao lado para abrir o WhatsApp com a proposta formatada pronta para o cliente.</p>
+                    </div>
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <button onclick="copiarProposta()" class="w-full sm:w-auto bg-slate-700 hover:bg-slate-600 text-white font-medium px-4 py-2.5 rounded-xl text-xs transition">
+                            Copiar Texto
+                        </button>
+                        <button onclick="enviarWhatsApp()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-5 py-2.5 rounded-xl text-xs transition shadow-md shadow-emerald-950">
+                            Enviar no WhatsApp (11) 94766-2843
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fmt = (v) => (Number.isFinite(v) ? v : 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        const num = (id, fallback=0) => {
+            const el = document.getElementById(id);
+            if (!el) return fallback;
+            const raw = String(el.value ?? '').trim();
+            if (!raw) return fallback;
+            const parsed = Number(raw.replace(',', '.'));
+            return Number.isFinite(parsed) ? parsed : fallback;
+        };
+        function parseMoeda(value) {
+            if (typeof value === 'number') return value;
+            const raw = String(value || '').replace(/[^0-9,.-]/g, '');
+            if (!raw) return 0;
+            return Number(raw.replace(/\./g, '').replace(',', '.')) || 0;
+        }
+        function mascaraMoeda(input) {
+            const digits = String(input.value || '').replace(/\D/g, '');
+            const amount = (Number(digits || 0) / 100).toFixed(2);
+            const [whole, cents] = amount.split('.');
+            input.value = Number(whole).toLocaleString('pt-BR') + ',' + cents;
+        }
+        function atualizarOpcoesReduzida() {
+            const prod = document.getElementById('produto').value;
+            const sel = document.getElementById('parcelaReduzida');
+            const opts = (prod === 'auto')
+                ? [['red30','Reduzida 30% (paga 70% da parcela-base)'],['red50','Reduzida 50% (paga 50% da parcela-base)']]
+                : [['red25','Reduzida 25% (paga 75% da parcela-base)'],['red50','Reduzida 50% (paga 50% da parcela-base)']];
+            sel.innerHTML = '';
+            opts.forEach(([value,label]) => { const o=document.createElement('option'); o.value=value; o.textContent=label; sel.appendChild(o); });
+        }
+        function toggleReduzida() {
+            document.getElementById('subBlocoReduzida').style.display = document.getElementById('ativarReduzida').checked ? 'block' : 'none';
+            calcular();
+        }
+
+        // Referências do Banco Central: crédito imobiliário PF, taxas reguladas,
+        // pós-fixadas referenciadas em TR, período de 01 a 30/09/2026.
+        // São médias/valores observados na modalidade, não ofertas individuais nem CET.
+        const taxasBancosImobiliario = {
+            caixa: 7.98,
+            bradesco: 11.77,
+            santander: 11.85,
+            itau: 11.87,
+            bb: 10.61,
+            inter: 9.66,
+            sicoob: 10.01,
+            sicredi: 10.50
+        };
+        function selecionarBanco() {
+            const banco = document.getElementById('bancoFin').value;
+            const campo = document.getElementById('jurosBanco');
+            const nota = document.getElementById('notaBanco');
+            if (banco === 'manual') {
+                campo.readOnly = false;
+                nota.textContent = 'Taxa personalizada inserida manualmente. Confirme a taxa e o CET na proposta bancária.';
+            } else {
+                campo.value = taxasBancosImobiliario[banco].toFixed(2);
+                campo.readOnly = false; // permite ajuste fino conforme perfil e proposta
+                nota.textContent = 'Referência BCB: setembro/2026, PF, imobiliário regulado com TR. Valor editável; não representa taxa aprovada nem CET.';
+            }
+            calcular();
+        }
+        // Valores iniciais ilustrativos para comparação, não cotações oficiais ou atuais.
+        // Bradesco: referência ilustrativa de 1,61% ao mês convertida para taxa efetiva anual.
+        const taxasBancosAuto = {
+            santander: 24.00,
+            itau: 23.00,
+            pan: 27.00,
+            bv: 26.00,
+            bradesco: (Math.pow(1.0161, 12) - 1) * 100
+        };
+        function selecionarBancoAuto() {
+            const banco = document.getElementById('bancoAuto').value;
+            const campo = document.getElementById('jurosBanco');
+            const nota = document.getElementById('notaBancoAuto');
+            if (banco === 'manual') {
+                nota.textContent = 'Taxa personalizada. Confirme taxa efetiva anual e CET na proposta bancária.';
+            } else {
+                campo.value = taxasBancosAuto[banco].toFixed(2);
+                nota.textContent = 'Referência ilustrativa editável, não taxa vigente ou aprovada. Verifique condições e CET com o banco.';
+            }
+            calcular();
+        }
+        function atualizarBancoPorProduto(prod) {
+            const bloco = document.getElementById('blocoBancoImovel');
+            const blocoAuto = document.getElementById('blocoBancoAuto');
+            const seletor = document.getElementById('bancoFin');
+            bloco.style.display = prod === 'imovel' ? 'block' : 'none';
+            blocoAuto.style.display = prod === 'auto' ? 'block' : 'none';
+            if (prod === 'imovel') {
+                if (seletor.value === 'manual') seletor.value = 'caixa';
+                selecionarBanco();
+            } else if (prod === 'auto') {
+                selecionarBancoAuto();
+            } else {
+                seletor.value = 'manual';
+            }
+        }
+        function mudarProduto() {
+            const prod = document.getElementById('produto').value;
+            const presets = {
+                imovel:{pc:200,pf:360,credito:'300.000,00',adm:20,reserva:2,juros:11.5,entrada:20,mes:12},
+                auto:{pc:60,pf:60,credito:'70.000,00',adm:15,reserva:2,juros:15.5,entrada:30,mes:6},
+                moto:{pc:60,pf:48,credito:'25.000,00',adm:18,reserva:2,juros:18,entrada:20,mes:6},
+                pesados:{pc:120,pf:96,credito:'450.000,00',adm:18,reserva:2,juros:14,entrada:20,mes:18},
+                embarcacao:{pc:100,pf:84,credito:'250.000,00',adm:18,reserva:2,juros:15,entrada:20,mes:12},
+                servicos:{pc:48,pf:48,credito:'30.000,00',adm:18,reserva:2,juros:17,entrada:20,mes:6},
+                capital_giro:{pc:60,pf:48,credito:'100.000,00',adm:18,reserva:2,juros:22,entrada:10,mes:6},
+                investimento:{pc:180,pf:180,credito:'500.000,00',adm:18,reserva:2,juros:11.5,entrada:20,mes:6}
+            };
+            const p = presets[prod] || presets.imovel;
+            document.getElementById('prazoConsorcio').value=p.pc;
+            document.getElementById('prazoFin').value=p.pf;
+            document.getElementById('credito').value=p.credito;
+            document.getElementById('taxaAdmAnual').value=p.adm;
+            document.getElementById('fundoReservaPct').value=p.reserva;
+            document.getElementById('seguroMensalPct').value=0;
+            document.getElementById('jurosBanco').value=p.juros;
+            atualizarBancoPorProduto(prod);
+            document.getElementById('entradaPct').value=p.entrada;
+            document.getElementById('mesContemplacao').value=p.mes;
+            document.getElementById('lanceLivre').value='0,00';
+            document.getElementById('lanceEmbutidoPct').value=0;
+            document.getElementById('ativarReduzida').checked=false;
+            document.getElementById('subBlocoReduzida').style.display='none';
+            document.getElementById('blocoInvestimentoConfig').style.display='none';
+            document.getElementById('blocoExplicacaoInvestimento').style.display='none';
+            atualizarOpcoesReduzida();
+            calcular();
+        }
+        function calcularFinanciamento(principal, taxaAnualPct, meses, sistema) {
+            if (principal <= 0 || meses <= 0) return { primeira:0, ultima:0, juros:0, total:0 };
+            const i = Math.pow(1 + Math.max(0,taxaAnualPct)/100, 1/12) - 1; // taxa efetiva mensal equivalente
+            let total=0, primeira=0, ultima=0, saldo=principal;
+            if (sistema === 'sac') {
+                const amort = principal / meses;
+                for (let m=1; m<=meses; m++) {
+                    const parcela = amort + saldo*i;
+                    if (m===1) primeira=parcela;
+                    ultima=parcela; total+=parcela; saldo=Math.max(0,saldo-amort);
+                }
+            } else {
+                const parcela = i===0 ? principal/meses : principal*i/(1-Math.pow(1+i,-meses));
+                primeira=parcela; ultima=parcela; total=parcela*meses;
+            }
+            return { primeira, ultima, juros:Math.max(0,total-principal), total };
+        }
+        function calcular() {
+            const produtoEl=document.getElementById('produto');
+            const produto=produtoEl.value;
+            const credito=parseMoeda(document.getElementById('credito').value);
+            const prazoCons=Math.max(1,Math.min(600,Math.floor(num('prazoConsorcio',1))));
+            const prazoFin=Math.max(1,Math.min(600,Math.floor(num('prazoFin',1))));
+            const taxaAdmPct=Math.max(0,num('taxaAdmAnual',0)); // taxa TOTAL contratual do plano
+            const reservaPct=Math.max(0,num('fundoReservaPct',0));
+            const seguroMensalPct=Math.max(0,num('seguroMensalPct',0));
+            const ativarRed=document.getElementById('ativarReduzida').checked;
+            const modalidade=document.getElementById('parcelaReduzida').value;
+            const mesCont=Math.max(1,Math.min(prazoCons,Math.floor(num('mesContemplacao',1))));
+            const fatorReducao=modalidade==='red50'?0.50:(modalidade==='red30'?0.70:0.75);
+            const totalAdm=credito*taxaAdmPct/100;
+            const totalReserva=credito*reservaPct/100;
+            const totalSeguro=credito*(seguroMensalPct/100)*prazoCons; // simplificação: seguro fixo sobre crédito original
+            const totalPlano=credito+totalAdm+totalReserva+totalSeguro;
+            const parcelaBase=totalPlano/prazoCons;
+            const mesesAntes=mesCont;
+            const mesesDepois=Math.max(0,prazoCons-mesesAntes);
+            const parcelaPre=ativarRed?parcelaBase*fatorReducao:parcelaBase;
+            const pagoAntes=parcelaPre*mesesAntes;
+            const saldoAntesLance=Math.max(0,totalPlano-pagoAntes);
+            const lanceLivre=Math.max(0,parseMoeda(document.getElementById('lanceLivre').value));
+            const embPct=Math.max(0,Math.min(100,num('lanceEmbutidoPct',0)));
+            const lanceEmbutido=credito*embPct/100;
+            const lancePretendido=lanceLivre+lanceEmbutido;
+            const lanceAplicado=Math.min(lancePretendido,saldoAntesLance);
+            const lanceProprioAplicado=Math.min(lanceLivre,lanceAplicado);
+            const embutidoAplicado=Math.max(0,lanceAplicado-lanceProprioAplicado);
+            const creditoLiquido=Math.max(0,credito-embutidoAplicado);
+            const saldoDepoisLance=Math.max(0,saldoAntesLance-lanceAplicado);
+            const saldoSemLance=saldoAntesLance;
+            const parcelaPosSemLance=mesesDepois>0?saldoSemLance/mesesDepois:0;
+            const modoAbate=document.getElementById('tipoAbatimento').value;
+            let parcelaPos=0, prazoRestante=0, reducaoMeses=0;
+            if (mesesDepois===0) {
+                parcelaPos=0; prazoRestante=0;
+            } else if (modoAbate==='parcela') {
+                prazoRestante=mesesDepois;
+                parcelaPos=saldoDepoisLance/mesesDepois;
+            } else {
+                parcelaPos=parcelaPosSemLance;
+                prazoRestante=parcelaPos>0?Math.ceil(saldoDepoisLance/parcelaPos):0;
+                prazoRestante=Math.min(mesesDepois,prazoRestante);
+                reducaoMeses=mesesDepois-prazoRestante;
+            }
+            const totalParcelasCons= pagoAntes + parcelaPos*prazoRestante;
+            const desembolsoCons=totalParcelasCons+lanceProprioAplicado;
+            const valorEntradaPct=Math.max(0,Math.min(100,num('entradaPct',0)));
+            const valorEntrada=credito*valorEntradaPct/100;
+            const principalFin=Math.max(0,credito-valorEntrada);
+            const jurosAA=Math.max(0,num('jurosBanco',0));
+            const sistema=document.getElementById('sistemaFin').value;
+            const fin=calcularFinanciamento(principalFin,jurosAA,prazoFin,sistema);
+            const custoFin=valorEntrada+fin.total;
+            const diferenca=custoFin-desembolsoCons;
+            const fmtPct=(v)=>`${v.toLocaleString('pt-BR',{maximumFractionDigits:2})}%`;
+            document.getElementById('valLanceEmbutidoText').textContent=`Valor estimado do lance embutido: ${fmt(lanceEmbutido)} | Crédito líquido: ${fmt(creditoLiquido)}`;
+            document.getElementById('valEntradaText').textContent=`Entrada estimada: ${fmt(valorEntrada)} (${fmtPct(valorEntradaPct)})`;
+            document.getElementById('valEntradaFin').textContent=`${fmt(valorEntrada)} (${fmtPct(valorEntradaPct)})`;
+            document.getElementById('valParcBanco').textContent=fmt(fin.primeira);
+            document.getElementById('valUltParcBanco').textContent=fmt(fin.ultima);
+            document.getElementById('valJurosBanco').textContent=fmt(fin.juros);
+            document.getElementById('valCustoBanco').textContent=fmt(custoFin);
+            document.getElementById('valParcRed').textContent=fmt(parcelaPre);
+            document.getElementById('valParcPos').textContent=fmt(parcelaPos);
+            document.getElementById('valLanceProprio').textContent=fmt(lanceProprioAplicado);
+            document.getElementById('valCreditoLiquido').textContent=fmt(creditoLiquido);
+            document.getElementById('valCustoConsorcio').textContent=fmt(desembolsoCons);
+            document.getElementById('labelParcPre').textContent=ativarRed?`Parcela reduzida até o mês ${mesCont}:`:'Parcela estimada antes da contemplação:';
+            document.getElementById('divSubTituloFin').textContent=`Financiamento (${sistema.toUpperCase()})`;
+            document.getElementById('cardTitle1').textContent='Diferença estimada de desembolso';
+            document.getElementById('cardTitle2').textContent='Crédito líquido no consórcio';
+            document.getElementById('cardTitle3').textContent='Efeito estimado do lance';
+            const cardDiff=document.getElementById('resEconomia');
+            cardDiff.textContent=(diferenca>=0?'Consórcio: ':'Financiamento: ')+fmt(Math.abs(diferenca));
+            cardDiff.className='text-xl font-bold mt-1 '+(diferenca>=0?'text-emerald-400':'text-amber-400');
+            document.getElementById('resRendimentoTotal').textContent=fmt(creditoLiquido);
+            let impacto='Sem lance aplicado';
+            if (lanceAplicado>0) impacto=modoAbate==='prazo'?`Redução estimada de ${reducaoMeses} mês(es)`:`Parcela pós-lance: ${fmt(parcelaPos)}`;
+            document.getElementById('resPatrimonioFinal').textContent=impacto;
+            const aviso=[];
+            if (credito<=0) aviso.push('Informe um valor de crédito maior que zero.');
+            if (lancePretendido>saldoAntesLance+0.01) aviso.push('O lance informado supera o saldo estimado após as parcelas anteriores; o simulador limitou o abatimento ao saldo disponível.');
+            if (lanceEmbutido>credito*0.30+0.01) aviso.push('Confirme o limite de lance embutido permitido no regulamento do grupo.');
+            if (mesesDepois===0 && lanceAplicado>0) aviso.push('A contemplação foi simulada no último mês; não há parcelas posteriores para redistribuir.');
+            const diffLabel=diferenca>=0?'desembolso nominal estimado menor no consórcio':'desembolso nominal estimado menor no financiamento';
+            const diffText=fmt(Math.abs(diferenca));
+            const reducaoText=modoAbate==='prazo'?`O lance reduz aproximadamente ${reducaoMeses} mês(es) do período restante, mantendo a parcela pós-contemplação estimada em ${fmt(parcelaPos)}.`:`O lance é distribuído pelos ${prazoRestante} mês(es) restantes, levando a parcela pós-contemplação estimada a ${fmt(parcelaPos)}.`;
+            const resumo=`<strong>Resumo da simulação (valores nominais, sem reajuste futuro):</strong><br>`+
+              `• Crédito contratado: <strong>${fmt(credito)}</strong>; crédito líquido após lance embutido: <strong>${fmt(creditoLiquido)}</strong>.<br>`+
+              `• Composição estimada do plano: crédito ${fmt(credito)} + administração ${fmt(totalAdm)} (${fmtPct(taxaAdmPct)}) + reserva ${fmt(totalReserva)} (${fmtPct(reservaPct)}) + seguro estimado ${fmt(totalSeguro)} = <strong>${fmt(totalPlano)}</strong>.<br>`+
+              `• Antes da contemplação: ${mesesAntes} parcela(s) de ${fmt(parcelaPre)}. Lance próprio aplicado: ${fmt(lanceProprioAplicado)}; lance embutido aplicado: ${fmt(embutidoAplicado)}.<br>`+
+              `• ${reducaoText}<br>`+
+              `• Desembolso estimado no consórcio (parcelas + lance com recursos próprios): <strong>${fmt(desembolsoCons)}</strong>.<br>`+
+              `• Financiamento ${sistema.toUpperCase()}: entrada ${fmt(valorEntrada)} + parcelas ${fmt(fin.total)}; juros estimados ${fmt(fin.juros)}; desembolso total ${fmt(custoFin)}.<br>`+
+              `• Diferença nominal: <strong>${diffText}</strong> (${diffLabel}). Essa comparação não representa equivalência perfeita de prazo, disponibilidade imediata ou poder de compra.`+
+              (aviso.length?`<br><br><strong>Atenção:</strong><br>• ${aviso.join('<br>• ')}`:'');
+            document.getElementById('textoDiferencas').innerHTML=resumo;
+            // Mantém a área antiga de investimento oculta: projeções de valorização/aluguel não são retorno garantido.
+            document.getElementById('blocoExplicacaoInvestimento').style.display='none';
+            const bancoSelecionado = produto === 'imovel' ? document.getElementById('bancoFin').selectedOptions[0].text : produto === 'auto' ? document.getElementById('bancoAuto').selectedOptions[0].text : 'Taxa personalizada';
+            window.__simulacaoAtual={produto:produtoEl.options[produtoEl.selectedIndex].text,credito,prazoCons,prazoFin,mesCont,parcelaPre,parcelaPos,lanceLivre:lanceProprioAplicado,lanceEmbutido:embutidoAplicado,creditoLiquido,desembolsoCons,custoFin,diferenca,juros:fin.juros,entrada:valorEntrada,sistema,banco:bancoSelecionado,taxaAnual:jurosAA};
+        }
+        function textoProposta() {
+            const s=window.__simulacaoAtual;
+            if (!s) return 'Faça uma simulação antes de compartilhar.';
+            return `📊 *Simulação ilustrativa — Consórcio x Financiamento*\nConsultor: Fernando Leal\n\n• Segmento: ${s.produto}\n• Crédito de referência: ${fmt(s.credito)}\n• Crédito líquido no consórcio após lance embutido: ${fmt(s.creditoLiquido)}\n• Contemplação considerada apenas como hipótese: mês ${s.mesCont}\n• Parcela pré-contemplação: ${fmt(s.parcelaPre)}\n• Parcela pós-contemplação estimada: ${fmt(s.parcelaPos)}\n• Lance próprio aplicado: ${fmt(s.lanceLivre)}\n• Lance embutido aplicado: ${fmt(s.lanceEmbutido)}\n• Desembolso estimado no consórcio: ${fmt(s.desembolsoCons)}\n• Entrada no financiamento: ${fmt(s.entrada)}\n• Banco / referência: ${s.banco}\n• Taxa efetiva anual informada: ${s.taxaAnual.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}% a.a.\n• Juros estimados do financiamento: ${fmt(s.juros)}\n• Desembolso estimado no financiamento: ${fmt(s.custoFin)}\n\nValores nominais e ilustrativos. Não incluem necessariamente reajustes, seguros, tarifas, tributos ou custos previstos em contrato. A contemplação não é garantida no mês indicado.\n\n📲 Fernando Leal — (11) 94766-2843`;
+        }
+        function enviarWhatsApp() {
+            const url='https://wa.me/5511947662843?text='+encodeURIComponent(textoProposta());
+            window.open(url,'_blank','noopener');
+        }
+        async function copiarProposta() {
+            const txt=textoProposta();
+            try { await navigator.clipboard.writeText(txt); alert('Proposta copiada!'); }
+            catch(e) { window.prompt('Copie a proposta abaixo:',txt); }
+        }
+        window.onload = () => { atualizarOpcoesReduzida(); mudarProduto(); };
+
+    </script>
+
+<div class="fl-disclaimer">
+  Simulação matemática ilustrativa em valores nominais e sem projeção de reajustes futuros do crédito ou das parcelas. A taxa de administração e o fundo de reserva devem ser informados como percentuais totais do plano, conforme proposta/contrato; o seguro foi simplificado como percentual mensal fixo sobre o crédito original. A forma de aplicação do lance, a ordem de amortização, os limites de lance embutido, a parcela reduzida, os índices de correção, seguros, tarifas e demais encargos variam conforme grupo e contrato. A contemplação no mês escolhido é apenas uma hipótese matemática, nunca uma promessa. No financiamento, a taxa informada não substitui o CET; seguros, tarifas, tributos e demais custos podem alterar o resultado. Este simulador não substitui proposta oficial, regulamento ou análise da administradora/instituição financeira.
+</div>
+<footer class="fl-footer">
+  <strong>Fernando Leal | Consultor — Unifisa</strong><br>
+  Atendimento: (11) 94766-2843 · Instagram: @fernandoconsultorunifisa
+</footer>
+
+</body>
+</html>
