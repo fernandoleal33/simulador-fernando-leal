@@ -52,11 +52,11 @@
 </style>
 <div class="fl-site">
   <nav class="fl-nav">
-    <div class="fl-brand">FERNANDO LEAL <span>| CONSULTOR</span></div>
+    <div class="fl-brand"><span id="nomeMarca">FERNANDO LEAL</span> <span>| CONSULTOR</span></div>
     <div class="fl-navlinks">
       <a href="#solucoes">Soluções</a>
       <a href="#simulador">Simulador</a>
-      <a class="fl-cta" href="https://wa.me/5511947662843?text=Olá%2C%20Fernando!%20Gostaria%20de%20conversar%20sobre%20planejamento%20com%20consórcio." target="_blank" rel="noopener">Falar no WhatsApp</a>
+      <a id="whatsappNav" class="fl-cta" href="https://wa.me/5511947662843?text=Olá%2C%20Fernando!%20Gostaria%20de%20conversar%20sobre%20planejamento%20com%20consórcio." target="_blank" rel="noopener">Falar no WhatsApp</a>
     </div>
   </nav>
   <section class="fl-hero">
@@ -100,16 +100,16 @@
         <!-- Header -->
         <header class="mb-8 border-b border-slate-800 pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-                <span class="bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Fernando Leal • Consultoria & Vendas</span>
+                <span class="bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider"><span id="nomeCabecalho">Fernando Leal</span> • Consultoria & Vendas</span>
                 <h1 class="text-2xl md:text-3xl font-bold text-white mt-2">Simulador Estratégico: Consórcio vs Financiamento</h1>
                 <p class="text-slate-400 text-sm mt-1">Diferenciação clara entre Entrada Bancária Obrigatória e Lance/Antecipação no Consórcio.</p>
             </div>
             <div class="bg-slate-800 border border-slate-700 p-3 rounded-xl flex items-center gap-3">
                 <div>
                     <p class="text-xs text-slate-400">Atendimento WhatsApp</p>
-                    <p class="text-sm font-semibold text-emerald-400">(11) 94766-2843</p>
+                    <p id="telefoneCabecalho" class="text-sm font-semibold text-emerald-400">(11) 94766-2843</p>
                 </div>
-                <a href="https://wa.me/5511947662843?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20consórcio." target="_blank" rel="noopener" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition">WhatsApp</a>
+                <a id="whatsappCabecalho" href="https://wa.me/5511947662843?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20consórcio." target="_blank" rel="noopener" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition">WhatsApp</a>
             </div>
         </header>
 
@@ -346,7 +346,7 @@
                             Copiar Texto
                         </button>
                         <button onclick="enviarWhatsApp()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-5 py-2.5 rounded-xl text-xs transition shadow-md shadow-emerald-950">
-                            Enviar no WhatsApp (11) 94766-2843
+                            <span id="telefoneBotao">Enviar no WhatsApp (11) 94766-2843</span>
                         </button>
                     </div>
                 </div>
@@ -354,6 +354,22 @@
         </div>
     </div>
 
+<section class="max-w-7xl mx-auto px-4 pb-8">
+  <div class="bg-slate-800/60 border border-slate-700/60 rounded-2xl p-5">
+    <h2 class="text-lg font-semibold text-white">Personalizar link do consultor</h2>
+    <p class="text-sm text-slate-300 my-3">Crie um link com nome e WhatsApp próprios. Os cálculos são os mesmos para todos.</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <label class="text-sm text-slate-200">Nome<input id="nomeGerador" maxlength="70" class="mt-1 w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white" value="Fernando Leal"></label>
+      <label class="text-sm text-slate-200">WhatsApp com DDD<input id="telefoneGerador" type="tel" class="mt-1 w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white" value="(11) 94766-2843"></label>
+    </div>
+    <div class="flex flex-wrap gap-3 my-3">
+      <button type="button" onclick="gerarLinkConsultor()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg">Gerar link</button>
+      <button type="button" onclick="copiarLinkConsultor()" class="bg-slate-700 text-white px-4 py-2 rounded-lg">Copiar link</button>
+    </div>
+    <input id="linkGerado" readonly aria-label="Link personalizado" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-slate-200">
+    <p id="avisoGerador" role="status" class="text-sm text-slate-300 mt-2"></p>
+  </div>
+</section>
     <script>
         const fmt = (v) => (Number.isFinite(v) ? v : 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         const num = (id, fallback=0) => {
@@ -610,10 +626,10 @@
         function textoProposta() {
             const s=window.__simulacaoAtual;
             if (!s) return 'Faça uma simulação antes de compartilhar.';
-            return `📊 *Simulação ilustrativa — Consórcio x Financiamento*\nConsultor: Fernando Leal\n\n• Segmento: ${s.produto}\n• Crédito de referência: ${fmt(s.credito)}\n• Crédito líquido no consórcio após lance embutido: ${fmt(s.creditoLiquido)}\n• Contemplação considerada apenas como hipótese: mês ${s.mesCont}\n• Parcela pré-contemplação: ${fmt(s.parcelaPre)}\n• Parcela pós-contemplação estimada: ${fmt(s.parcelaPos)}\n• Lance próprio aplicado: ${fmt(s.lanceLivre)}\n• Lance embutido aplicado: ${fmt(s.lanceEmbutido)}\n• Desembolso estimado no consórcio: ${fmt(s.desembolsoCons)}\n• Entrada no financiamento: ${fmt(s.entrada)}\n• Banco / referência: ${s.banco}\n• Taxa efetiva anual informada: ${s.taxaAnual.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}% a.a.\n• Juros estimados do financiamento: ${fmt(s.juros)}\n• Desembolso estimado no financiamento: ${fmt(s.custoFin)}\n\nValores nominais e ilustrativos. Não incluem necessariamente reajustes, seguros, tarifas, tributos ou custos previstos em contrato. A contemplação não é garantida no mês indicado.\n\n📲 Fernando Leal — (11) 94766-2843`;
+            return `📊 *Simulação ilustrativa — Consórcio x Financiamento*\nConsultor: ${consultorAtual.nome}\n\n• Segmento: ${s.produto}\n• Crédito de referência: ${fmt(s.credito)}\n• Crédito líquido no consórcio após lance embutido: ${fmt(s.creditoLiquido)}\n• Contemplação considerada apenas como hipótese: mês ${s.mesCont}\n• Parcela pré-contemplação: ${fmt(s.parcelaPre)}\n• Parcela pós-contemplação estimada: ${fmt(s.parcelaPos)}\n• Lance próprio aplicado: ${fmt(s.lanceLivre)}\n• Lance embutido aplicado: ${fmt(s.lanceEmbutido)}\n• Desembolso estimado no consórcio: ${fmt(s.desembolsoCons)}\n• Entrada no financiamento: ${fmt(s.entrada)}\n• Banco / referência: ${s.banco}\n• Taxa efetiva anual informada: ${s.taxaAnual.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}% a.a.\n• Juros estimados do financiamento: ${fmt(s.juros)}\n• Desembolso estimado no financiamento: ${fmt(s.custoFin)}\n\nValores nominais e ilustrativos. Não incluem necessariamente reajustes, seguros, tarifas, tributos ou custos previstos em contrato. A contemplação não é garantida no mês indicado.\n\n📲 ${consultorAtual.nome} — ${consultorAtual.formatado}`;
         }
         function enviarWhatsApp() {
-            const url='https://wa.me/5511947662843?text='+encodeURIComponent(textoProposta());
+            const url='https://wa.me/'+consultorAtual.numero+'?text='+encodeURIComponent(textoProposta());
             window.open(url,'_blank','noopener');
         }
         async function copiarProposta() {
@@ -621,7 +637,53 @@
             try { await navigator.clipboard.writeText(txt); alert('Proposta copiada!'); }
             catch(e) { window.prompt('Copie a proposta abaixo:',txt); }
         }
-        window.onload = () => { atualizarOpcoesReduzida(); mudarProduto(); };
+        
+        const consultorPadrao = {nome:'Fernando Leal',numero:'5511947662843'};
+        let consultorAtual = { ...consultorPadrao,formatado:'(11) 94766-2843'};
+        function validarConsultor(nome, telefone) {
+          nome=String(nome||'').trim().replace(/\\s+/g,' ');
+          let numero=String(telefone||'').replace(/\\D/g,'');
+          if(numero.length===10||numero.length===11) numero='55'+numero;
+          if(nome.length<2||nome.length>70||/[<>]/.test(nome)||!/^55\\d{10,11}$/.test(numero)) return null;
+          const local=numero.slice(2);
+          return {nome,numero,formatado:'('+local.slice(0,2)+') '+local.slice(2,-4)+'-'+local.slice(-4)};
+        }
+        function gerarLinkConsultor() {
+          const dados=validarConsultor(document.getElementById('nomeGerador').value,document.getElementById('telefoneGerador').value);
+          const saida=document.getElementById('linkGerado');
+          if(!dados){saida.value='';document.getElementById('avisoGerador').textContent='Informe nome e WhatsApp com DDD válidos.';return;}
+          const url=new URL(window.location.origin+window.location.pathname);
+          url.searchParams.set('consultor',dados.nome);
+          url.searchParams.set('whatsapp',dados.numero);
+          saida.value=url.toString();
+          document.getElementById('avisoGerador').textContent='Link pronto para compartilhar.';
+        }
+        async function copiarLinkConsultor(){
+          gerarLinkConsultor();
+          const link=document.getElementById('linkGerado').value;
+          if(!link)return;
+          try{await navigator.clipboard.writeText(link);document.getElementById('avisoGerador').textContent='Link copiado!';}
+          catch(e){window.prompt('Copie seu link:',link);}
+        }
+        function aplicarConsultor(){
+          const q=new URLSearchParams(window.location.search);
+          consultorAtual=validarConsultor(q.get('consultor'),q.get('whatsapp'))||validarConsultor(consultorPadrao.nome,consultorPadrao.numero);
+          const d=consultorAtual;
+          document.getElementById('nomeMarca').textContent=d.nome.toLocaleUpperCase('pt-BR');
+          document.getElementById('nomeCabecalho').textContent=d.nome;
+          document.getElementById('nomeRodape').textContent=d.nome;
+          document.getElementById('telefoneCabecalho').textContent=d.formatado;
+          document.getElementById('telefoneRodape').textContent=d.formatado;
+          document.getElementById('telefoneBotao').textContent='Enviar no WhatsApp '+d.formatado;
+          document.getElementById('whatsappNav').href='https://wa.me/'+d.numero+'?text='+encodeURIComponent('Olá, '+d.nome+'! Gostaria de conversar sobre consórcio.');
+          document.getElementById('whatsappCabecalho').href='https://wa.me/'+d.numero+'?text='+encodeURIComponent('Olá! Gostaria de saber mais sobre consórcio.');
+          document.getElementById('instagramRodape').hidden=d.nome!==consultorPadrao.nome||d.numero!==consultorPadrao.numero;
+          document.title=d.nome+' | Consultor Unifisa — Planejamento e Consórcio';
+          document.getElementById('nomeGerador').value=d.nome;
+          document.getElementById('telefoneGerador').value=d.formatado;
+          gerarLinkConsultor();
+        }
+        window.onload = () => { aplicarConsultor(); atualizarOpcoesReduzida(); mudarProduto(); };
 
     </script>
 
@@ -629,8 +691,8 @@
   Simulação matemática ilustrativa em valores nominais e sem projeção de reajustes futuros do crédito ou das parcelas. A taxa de administração e o fundo de reserva devem ser informados como percentuais totais do plano, conforme proposta/contrato; o seguro foi simplificado como percentual mensal fixo sobre o crédito original. A forma de aplicação do lance, a ordem de amortização, os limites de lance embutido, a parcela reduzida, os índices de correção, seguros, tarifas e demais encargos variam conforme grupo e contrato. A contemplação no mês escolhido é apenas uma hipótese matemática, nunca uma promessa. No financiamento, a taxa informada não substitui o CET; seguros, tarifas, tributos e demais custos podem alterar o resultado. Este simulador não substitui proposta oficial, regulamento ou análise da administradora/instituição financeira.
 </div>
 <footer class="fl-footer">
-  <strong>Fernando Leal | Consultor — Unifisa</strong><br>
-  Atendimento: (11) 94766-2843 · Instagram: @fernandoconsultorunifisa
+  <strong><span id="nomeRodape">Fernando Leal</span> | Consultor — Unifisa</strong><br>
+  Atendimento: <span id="telefoneRodape">(11) 94766-2843</span><span id="instagramRodape"> · Instagram: @fernandoconsultorunifisa</span>
 </footer>
 
 </body>
