@@ -791,7 +791,8 @@
           const credito=document.getElementById('creditoUnifisa'),prazo=document.getElementById('prazoUnifisa');
           credito.replaceChildren();prazo.replaceChildren();
           if(!sel.value){document.getElementById('detalheUnifisa').textContent='Selecione uma tabela comercial para preencher os parâmetros automaticamente.';return;}
-          for(const v of creditosTabela[produto]){const o=document.createElement('option');o.value=v;o.textContent=fmt(v);credito.appendChild(o);}
+          const creditos=(produto==='auto'&&['betha30','gamma30'].includes(sel.value))?[300000,280000,260000,240000,220000,200000,190000,180000,170000,160000,150000,140000,130000,120000,110000,100000,90000,80000,70000]:creditosTabela[produto];
+          for(const v of creditos){const o=document.createElement('option');o.value=v;o.textContent=fmt(v);credito.appendChild(o);}
           for(const v of planos[sel.value].prazos){const o=document.createElement('option');o.value=v;o.textContent=v+' meses';prazo.appendChild(o);}
           aplicarTabelaUnifisa();
         }
