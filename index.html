@@ -224,7 +224,15 @@
                         </div>
                     </div>
 
-                    <!-- Financiamento Bancário Section -->
+                    <div id="tabelaUnifisa" class="bg-slate-900/70 border border-emerald-800/50 p-4 rounded-xl space-y-2">
+<h3 class="text-sm font-semibold text-emerald-400">Tabela comercial Unifisa — imóveis</h3>
+<p class="text-xs text-slate-400">Planos imobiliários conferidos nas páginas 9, 16 e 17 da tabela fornecida. Selecione uma combinação existente; outras modalidades permanecem em simulação manual.</p>
+<label class="block text-xs">Plano<select id="planoUnifisa" class="w-full bg-slate-900 border border-slate-600 rounded p-2"><option value="">Simulação personalizada</option><option value="alphaPlus">Alpha Plus — página 9</option><option value="sigma">Sigma — página 16</option><option value="delta">Delta — página 17</option></select></label>
+<label class="block text-xs">Crédito disponível<select id="creditoUnifisa" class="w-full bg-slate-900 border border-slate-600 rounded p-2"></select></label>
+<label class="block text-xs">Prazo disponível<select id="prazoUnifisa" class="w-full bg-slate-900 border border-slate-600 rounded p-2"></select></label>
+<p id="detalheUnifisa" class="text-xs text-emerald-200" aria-live="polite">Selecione um plano para consultar os valores da tabela.</p>
+<p class="text-xs text-amber-200">Parcelas são valores de tabela antes de reajustes futuros. Antecipações e seguro devem ser confirmados nas condições da cota. Os cálculos genéricos abaixo podem diferir das parcelas comerciais.</p></div>
+                     <!-- Financiamento Bancário Section -->
                     <div class="pt-2 border-t border-slate-700 space-y-3">
                         <h3 class="text-xs font-semibold text-red-400 uppercase">Parâmetros de Financiamento Bancário</h3>
                         <div>
@@ -531,6 +539,7 @@
             atualizarBancoPorProduto(prod);
             atualizarTaxaCenario();
             document.getElementById('painelIndices').style.display=prod==='investimento'?'block':'none';
+            document.getElementById('tabelaUnifisa').style.display=prod==='imovel'?'block':'none';
             if(prod==='investimento'){document.getElementById('prazoConsorcio').value=240;sincronizarPrazoPatrimonial();}
             const investimento=prod==='investimento';
             document.getElementById('resEconomia').closest('.grid.grid-cols-1').style.display=investimento?'none':'grid';
@@ -738,6 +747,63 @@
           const aviso=document.createElement('p');aviso.textContent='A valorização não é rendimento do consórcio. Não há lucro líquido calculado: custos, parcelas e obrigações não foram deduzidos.';out.appendChild(aviso);
           window.propostaIndice='Projeção patrimonial ilustrativa\\nConsultor: '+consultorAtual.nome+'\\nCarta inicial: '+fmt(valor)+'\\nCarta corrigida: '+fmt(credito)+'\\nImóvel projetado: '+fmt(imovel)+'\\nNão representa lucro líquido nem retorno garantido.';
         }
+
+        // Transcrição conferida: tabela comercial fornecida, páginas 9, 16 e 17.
+        const planosUnifisa={
+          alphaPlus:{prazos:[200,180,160,140,120,100,80,60],adm:[20,18,18,17,16,15,14,13],antecipacao:4,reserva:2.5,seguro:0.03,creditos:{
+            400000:[2517,2733.49,3057.10,3443.40,3958.87,4681,5764.80,7571.93],
+            380000:[2391.15,2596.81,2904.25,3271.23,3760.92,4446.95,5476.56,7193.34],
+            360000:[2265.30,2460.14,2751.39,3099.06,3562.98,4212.90,5188.32,6814.74],
+            340000:[2139.45,2323.47,2598.54,2926.89,3365.04,3978.85,4900.08,6436.14],
+            320000:[2013.60,2186.79,2445.68,2754.72,3167.09,3744.80,4611.84,6057.55],
+            300000:[1887.75,2050.12,2292.83,2582.55,2969.15,3510.75,4323.60,5678.95],
+            280000:[1761.90,1913.44,2139.97,2410.38,2771.21,3276.70,4035.36,5300.35],
+            260000:[1636.05,1776.77,1987.12,2238.21,2573.26,3042.65,3747.12,4921.76],
+            240000:[1510.20,1640.09,1834.26,2066.04,2375.32,2808.60,3458.88,4543.16],
+            220000:[1384.35,1503.42,1681.41,1893.87,2177.38,2574.55,3170.64,4164.56],
+            200000:[1258.50,1366.74,1528.55,1721.70,1979.43,2340.50,2882.40,3785.97],
+            190000:[1195.58,1298.41,1452.12,1635.62,1880.46,2223.48,2738.28,3596.67],
+            180000:[1132.65,1230.07,1375.70,1549.53,1781.49,2106.45,2594.16,3407.37],
+            170000:[1069.73,1161.73,1299.27,1463.45,1682.52,1989.43,2450.04,3218.07],
+            160000:[1006.80,1093.40,1222.84,1377.36,1583.55,1872.40,2305.92,3028.77],
+            150000:[943.88,1025.06,1146.41,1291.28,1484.58,1755.38,2161.80,2839.48],
+            140000:[880.95,956.72,1069.99,1205.19,1385.60,1638.35,2017.68,2650.18],
+            130000:[818.03,888.38,993.56,1119.11,1286.63,1521.33,1873.56,2460.88],
+            120000:[755.10,820.05,917.13,1033.02,1187.66,1404.30,1729.44,2271.58],
+            110000:[692.18,751.71,840.70,946.94,1088.69,1287.28,1585.32,2082.28]
+          }},
+          sigma:{prazos:[240,220],adm:[24,23],antecipacao:2,reserva:2.5,seguro:0.03,creditos:{
+            500000:[2783.50,2995.07],480000:[2672.16,2875.27],460000:[2560.82,2755.46],440000:[2449.48,2635.66],420000:[2338.14,2515.86],400000:[2226.80,2396.05],380000:[2115.46,2276.25],360000:[2004.12,2156.45],340000:[1892.78,2036.65],320000:[1781.44,1916.84],300000:[1670.10,1797.04],280000:[1558.76,1677.24],260000:[1447.42,1557.44],250000:[1391.75,1497.53]
+          }},
+          delta:{prazos:[240,220],adm:[26,25],antecipacao:1,reserva:2.5,seguro:0.03,creditos:{
+            500000:[2849,3066.25],480000:[2735.04,2943.60],460000:[2621.08,2820.95],440000:[2507.12,2698.30],420000:[2393.16,2575.65],400000:[2279.20,2453],380000:[2165.24,2330.35],360000:[2051.28,2207.70],340000:[1937.32,2085.05],320000:[1823.36,1962.40],300000:[1709.40,1839.75],280000:[1595.44,1717.10],260000:[1481.48,1594.45],250000:[1424.50,1533.13]
+          }}
+        };
+        function atualizarTabelaUnifisa(){
+          const tipo=document.getElementById('planoUnifisa').value;
+          const c=document.getElementById('creditoUnifisa'),p=document.getElementById('prazoUnifisa');
+          const plano=planosUnifisa[tipo];
+          c.replaceChildren();p.replaceChildren();
+          if(!plano){document.getElementById('detalheUnifisa').textContent='Simulação personalizada — sem correspondência automática com tabela.';return;}
+          Object.keys(plano.creditos).sort((a,b)=>Number(b)-Number(a)).forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=fmt(Number(v));c.appendChild(o);});
+          plano.prazos.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v+' meses';p.appendChild(o);});
+          aplicarTabelaUnifisa();
+        }
+        function aplicarTabelaUnifisa(){
+          const tipo=document.getElementById('planoUnifisa').value,plano=planosUnifisa[tipo];
+          if(!plano)return;
+          const credito=Number(document.getElementById('creditoUnifisa').value);
+          const prazo=Number(document.getElementById('prazoUnifisa').value);
+          const indice=plano.prazos.indexOf(prazo);
+          if(!plano.creditos[credito]||indice<0)return;
+          const parcela=plano.creditos[credito][indice];
+          document.getElementById('credito').value=credito.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+          document.getElementById('prazoConsorcio').value=prazo;
+          document.getElementById('taxaAdmAnual').value=plano.adm[indice];
+          document.getElementById('fundoReservaPct').value=plano.reserva;
+          document.getElementById('detalheUnifisa').textContent='Parcela da tabela: '+fmt(parcela)+' | Administração total: '+plano.adm[indice]+'% | Antecipação: '+plano.antecipacao+'% | Fundo de reserva: '+plano.reserva+'% | Seguro: '+plano.seguro+'% mensal | Correção: INCC. Valores sujeitos às regras do plano e reajustes.';
+          calcular();
+        }
         const consultorPadrao = {nome:'Fernando Leal',numero:'5511947662843'};
         let consultorAtual = { ...consultorPadrao,formatado:'(11) 94766-2843'};
         function validarConsultor(nome, telefone) {
@@ -787,6 +853,8 @@
             aplicarConsultor();
             atualizarOpcoesReduzida();
             mudarProduto();
+            document.getElementById('planoUnifisa').addEventListener('change',atualizarTabelaUnifisa);
+            for(const id of ['creditoUnifisa','prazoUnifisa'])document.getElementById(id).addEventListener('change',aplicarTabelaUnifisa);
             document.getElementById('indiceOficial').addEventListener('change',atualizarIndice);
             for(const id of ['taxaOficial','anosIndice','valorizacaoIndice'])document.getElementById(id).addEventListener('input',calcularIndice);
             document.getElementById('prazoConsorcio').addEventListener('input',sincronizarPrazoPatrimonial);
