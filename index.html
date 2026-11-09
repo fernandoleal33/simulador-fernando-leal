@@ -423,7 +423,7 @@
             const prod = document.getElementById('produto').value;
             const sel = document.getElementById('parcelaReduzida');
             const opts = (prod === 'auto')
-                ? [['red30','Reduzida 30% (paga 70% da parcela-base)'],['red50','Reduzida 50% (paga 50% da parcela-base)']]
+                ? [['red30','Gamma 30% (paga 70% da parcela-base)']]
                 : [['red25','Reduzida 25% (paga 75% da parcela-base)'],['red50','Reduzida 50% (paga 50% da parcela-base)']];
             sel.innerHTML = '';
             opts.forEach(([value,label]) => { const o=document.createElement('option'); o.value=value; o.textContent=label; sel.appendChild(o); });
@@ -844,9 +844,12 @@
           const sel=document.getElementById('planoUnifisa');
           const anterior=sel.value;
           const planos=tabelaPlanos[produto]||{};
+          // Em automóveis leves, somente planos próprios da categoria.
+          const permitidosAuto=new Set(['alphaPlus','betha','gamma','gamma30']);
           sel.replaceChildren();
           const livre=document.createElement('option');livre.value='';livre.textContent='Simulação personalizada';sel.appendChild(livre);
           for(const [chave,p] of Object.entries(planos)){
+            if(produto==='auto'&&!permitidosAuto.has(chave))continue;
             const o=document.createElement('option');o.value=chave;o.textContent=p.nome;sel.appendChild(o);
           }
           if(Object.prototype.hasOwnProperty.call(planos,anterior))sel.value=anterior;
