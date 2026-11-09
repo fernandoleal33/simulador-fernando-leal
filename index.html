@@ -723,6 +723,7 @@
             const plano=tabelaPlanos[produto]?.[document.getElementById('planoUnifisa').value];
             const prazo=s.prazoCons;
             if(plano&&!plano.prazos.includes(prazo)){alert('O prazo não corresponde à tabela selecionada. Ajuste o prazo antes de gerar a proposta.');return;}
+            if(plano){alert('Proposta comercial bloqueada temporariamente para tabelas automáticas: estamos conferindo as parcelas com a tabela oficial da administradora. Use apenas como simulação interna até a homologação.');return;}
             const adm=Math.max(0,num('taxaAdmAnual',0)),reserva=Math.max(0,num('fundoReservaPct',0));
             const data=new Date().toLocaleDateString('pt-BR');
             const linhas=[
