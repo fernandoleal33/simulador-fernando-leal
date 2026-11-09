@@ -598,8 +598,15 @@
             const parcelaBase=totalPlano/prazoCons;
             const mesesAntes=mesCont;
             const mesesDepois=Math.max(0,prazoCons-mesesAntes);
-            const parcelaPre=ativarRed?parcelaBase*fatorReducao:parcelaBase;
-            const pagoAntes=parcelaPre*mesesAntes;
+            const prazoTabelaAtual=planoSelecionado?.prazos.indexOf(prazoCons)??-1;
+            const antecipacaoAtiva=planoSelecionado&&prazoTabelaAtual>=0&&planoSelecionado.mesesAntecipacao>0;
+            const mesesTaxaAntecipada=antecipacaoAtiva?planoSelecionado.mesesAntecipacao:0;
+            const totalTaxaAntecipada=antecipacaoAtiva?credito*planoSelecionado.antecipacao/100:0;
+            const parcelaRegular=(totalPlano-totalTaxaAntecipada)/prazoCons;
+            const adicionalInicial=mesesTaxaAntecipada?totalTaxaAntecipada/mesesTaxaAntecipada:0;
+            const parcelaPre=(ativarRed?parcelaRegular*fatorReducao:parcelaRegular)+adicionalInicial;
+            const mesesAntecipadosPagos=Math.min(mesesAntes,mesesTaxaAntecipada);
+            const pagoAntes=(ativarRed?parcelaRegular*fatorReducao:parcelaRegular)*mesesAntes+adicionalInicial*mesesAntecipadosPagos;
             const saldoAntesLance=Math.max(0,totalPlano-pagoAntes);
             const lanceLivre=Math.max(0,parseMoeda(document.getElementById('lanceLivre').value));
             const embPct=Math.max(0,Math.min(100,num('lanceEmbutidoPct',0)));
@@ -650,8 +657,7 @@
             const valorAntecipado=credito*antecipacaoPct/100;
             linhaAntecipacao.style.display=mesesAntecipacao>0&&valorAntecipado>0?'flex':'none';
             if(mesesAntecipacao>0&&valorAntecipado>0){
-                const baseSemAntecipacao=(totalPlano-valorAntecipado)/prazoCons;
-                const primeiraComAntecipacao=baseSemAntecipacao+valorAntecipado/mesesAntecipacao;
+                const primeiraComAntecipacao=parcelaPre;
                 document.getElementById('labelAntecipacaoResumo').textContent=mesesAntecipacao===1?'1ª parcela (com antecipação):':`Primeiras ${mesesAntecipacao} parcelas (com antecipação):`;
                 document.getElementById('valAntecipacaoResumo').textContent=fmt(primeiraComAntecipacao);
             }
@@ -660,7 +666,7 @@
             document.getElementById('valLanceProprio').textContent=fmt(lanceProprioAplicado);
             document.getElementById('valCreditoLiquido').textContent=fmt(creditoLiquido);
             document.getElementById('valCustoConsorcio').textContent=fmt(desembolsoCons);
-            document.getElementById('labelParcPre').textContent=ativarRed?`Parcela reduzida até o mês ${mesCont}:`:'Parcela estimada antes da contemplação:';
+            document.getElementById('labelParcPre').textContent=mesesTaxaAntecipada?`Parcela inicial (primeiros ${mesesTaxaAntecipada} meses):`:(ativarRed?`Parcela reduzida até o mês ${mesCont}:`:'Parcela estimada antes da contemplação:');
             document.getElementById('divSubTituloFin').textContent=`Financiamento (${sistema.toUpperCase()})`;
             document.getElementById('cardTitle1').textContent='Diferença estimada de desembolso';
             document.getElementById('cardTitle2').textContent='Crédito líquido no consórcio';
