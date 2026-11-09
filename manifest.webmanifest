@@ -1,6 +1,6 @@
 {
-  "name": "Simulador de Consórcio e Financiamento",
-  "short_name": "Simulador",
+  "name": "SimuladorLotus — Consórcio e Financiamento",
+  "short_name": "SimuladorLotus",
   "description": "Simulações ilustrativas de consórcio, financiamento e planejamento patrimonial.",
   "lang": "pt-BR",
   "start_url": "./",
