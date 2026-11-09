@@ -682,8 +682,8 @@
             document.getElementById('valLanceEmbutidoText').textContent=`Valor estimado do lance embutido: ${fmt(lanceEmbutido)} | Crédito líquido: ${fmt(creditoLiquido)}`;
             document.getElementById('valEntradaText').textContent=`Entrada estimada: ${fmt(valorEntrada)} (${fmtPct(valorEntradaPct)})`;
             document.getElementById('valEntradaFin').textContent=`${fmt(valorEntrada)} (${fmtPct(valorEntradaPct)})`;
-            document.getElementById('valParcBanco').textContent=fmt(fin.primeira+seguroFin+encargosMensaisFin);
-            document.getElementById('valUltParcBanco').textContent=fmt(fin.ultima+seguroFin+encargosMensaisFin);
+            document.getElementById('valParcBanco').textContent=fmt(fin.primeira);
+            document.getElementById('valUltParcBanco').textContent=fmt(fin.ultima);
             document.getElementById('valJurosBanco').textContent=fmt(fin.juros);
             document.getElementById('valCustoBanco').textContent=fmt(custoFin);
             const linhaAntecipacao=document.getElementById('linhaAntecipacaoResumo');
