@@ -316,6 +316,7 @@
                         <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-2">
                             <p class="text-emerald-400 font-semibold text-xs uppercase mb-2">Consórcio (Sem Entrada Obrigatória)</p>
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400" id="labelParcPre">Parcela Pré-Contemplação:</span> <strong id="valParcRed">R$ 0</strong></div>
+                            <div id="linhaAntecipacaoResumo" class="flex justify-between py-1 border-b border-slate-800" style="display:none"><span class="text-amber-300" id="labelAntecipacaoResumo">Parcela com antecipação:</span><strong id="valAntecipacaoResumo" class="text-amber-200">R$ 0</strong></div>
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Parcela Pós-Contemplação:</span> <strong id="valParcPos" class="text-emerald-400">R$ 0</strong></div>
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Lance com recurso próprio:</span> <strong id="valLanceProprio" class="text-white">R$ 0</strong></div>
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Crédito líquido disponível:</span> <strong id="valCreditoLiquido" class="text-white">R$ 0</strong></div>
@@ -642,6 +643,18 @@
             document.getElementById('valUltParcBanco').textContent=fmt(fin.ultima);
             document.getElementById('valJurosBanco').textContent=fmt(fin.juros);
             document.getElementById('valCustoBanco').textContent=fmt(custoFin);
+            const linhaAntecipacao=document.getElementById('linhaAntecipacaoResumo');
+            const prazoTabela=planoSelecionado?.prazos.indexOf(prazoCons)??-1;
+            const antecipacaoPct=planoSelecionado&&prazoTabela>=0?planoSelecionado.antecipacao:0;
+            const mesesAntecipacao=planoSelecionado&&prazoTabela>=0?planoSelecionado.mesesAntecipacao:0;
+            const valorAntecipado=credito*antecipacaoPct/100;
+            linhaAntecipacao.style.display=mesesAntecipacao>0&&valorAntecipado>0?'flex':'none';
+            if(mesesAntecipacao>0&&valorAntecipado>0){
+                const baseSemAntecipacao=(totalPlano-valorAntecipado)/prazoCons;
+                const primeiraComAntecipacao=baseSemAntecipacao+valorAntecipado/mesesAntecipacao;
+                document.getElementById('labelAntecipacaoResumo').textContent=mesesAntecipacao===1?'1ª parcela (com antecipação):':`Primeiras ${mesesAntecipacao} parcelas (com antecipação):`;
+                document.getElementById('valAntecipacaoResumo').textContent=fmt(primeiraComAntecipacao);
+            }
             document.getElementById('valParcRed').textContent=fmt(parcelaPre);
             document.getElementById('valParcPos').textContent=fmt(parcelaPos);
             document.getElementById('valLanceProprio').textContent=fmt(lanceProprioAplicado);
