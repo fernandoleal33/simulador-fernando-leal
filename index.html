@@ -590,6 +590,7 @@
             const reservaPct=Math.max(0,num('fundoReservaPct',0));
             const seguroMensalPct=Math.max(0,num('seguroMensalPct',0));
             const planoSelecionado=tabelaPlanos[produto]?.[document.getElementById('planoUnifisa').value];
+            const prazoPlanoValido=!planoSelecionado||planoSelecionado.prazos.includes(prazoCons);
             const ativarRed=Boolean(planoSelecionado?.reducao);
             const modalidade=planoSelecionado?.reducao===0.5?'red50':planoSelecionado?.reducao===0.7?'red30':'nenhuma';
             const mesCont=Math.max(1,Math.min(prazoCons,Math.floor(num('mesContemplacao',1))));
@@ -673,6 +674,7 @@
             document.getElementById('valAposAntecipacao').textContent=fmt(parcelaReduzida);
             const nomePlano=planoSelecionado?.nome||'Personalizada';
             document.getElementById('linhaResumoPlano').textContent='Tabela: '+nomePlano+' | Administração: '+taxaAdmPct+'% | Antecipação: '+(antecipacaoAtiva?planoSelecionado.antecipacao:0)+'% | Reserva: '+reservaPct+'%';
+            if(!prazoPlanoValido)document.getElementById('linhaResumoPlano').textContent='ATENÇÃO: prazo fora da tabela comercial; ajuste o prazo. Os resultados exibidos não são válidos para proposta.';
             document.getElementById('valParcRed').textContent=fmt(parcelaPre);
             document.getElementById('valParcPos').textContent=fmt(parcelaPos);
             document.getElementById('valLanceProprio').textContent=fmt(lanceProprioAplicado);
@@ -725,6 +727,7 @@
             const plano=tabelaPlanos[produto]?.[document.getElementById('planoUnifisa').value];
             const prazo=s.prazoCons;
             if(plano&&!plano.prazos.includes(prazo)){alert('O prazo não corresponde à tabela selecionada. Ajuste o prazo antes de gerar a proposta.');return;}
+            if(!Number.isFinite(s.parcelaPre)||!Number.isFinite(s.desembolsoCons)){alert('Há valores inválidos. Revise a simulação.');return;}
             if(!plano||produto!=='imovel'||!['alphaPlus','betha','gamma','omega50','delta50'].includes(document.getElementById('planoUnifisa').value)){alert('PDF disponível apenas para tabelas de imóveis conferidas com o documento de referência. Outras opções permanecem para simulação interna.');return;}
             if(s.lanceLivre>0||s.lanceEmbutido>0){alert('Para gerar o PDF de referência, retire os lances. Cenários com lance exigem validação contratual individual.');return;}
             if(!(s.credito>=110000&&s.credito<=400000)){alert('O PDF de referência está limitado a créditos entre R$ 110 mil e R$ 400 mil, conforme a tabela de imóveis fornecida.');return;}
