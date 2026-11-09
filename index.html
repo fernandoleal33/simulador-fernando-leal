@@ -274,32 +274,6 @@
                             <p id="explicacaoTaxaCenario" class="text-xs text-amber-200 mt-2" role="status" aria-live="polite">Ajuste estimado. Confirme condições, elegibilidade e CET com o banco.</p>
                             <p class="text-[10px] text-slate-400 mt-1">Desmarque para informar uma taxa efetiva anual obtida em proposta real. Os ajustes não representam regras oficiais dos bancos.</p>
                         </div>
-                        <div class="rounded-lg border border-slate-700 bg-slate-900/60 p-3 space-y-3" id="painelReajusteFin">
-                            <p class="text-sm font-semibold text-amber-200">Projeção de correção do saldo devedor — financiamento imobiliário</p>
-                            <label class="block text-xs text-slate-300">Índice hipotético aplicado ao saldo
-                                <select id="indiceCorrecaoFin" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white">
-                                    <option value="tr">TR (contratos indexados à TR)</option>
-                                    <option value="ipca">IPCA (contratos indexados ao IPCA)</option>
-                                    <option value="incc">INCC (referência de imóveis em construção; não presumir em financiamento bancário)</option>
-                                    <option value="nenhum">Sem correção adicional</option>
-                                </select>
-                            </label>
-                            <label class="block text-xs text-slate-300">Variação anual hipotética do índice (% a.a.)
-                                <input id="taxaIndiceFin" type="number" value="0" min="0" max="100" step="0.01" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white" />
-                            </label>
-                            <button type="button" onclick="calcular()" class="w-full bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold py-3 rounded-xl">Projetar acréscimo no financiamento</button>
-                            <p id="resultadoCorrecaoFin" class="text-xs text-emerald-200" role="status" aria-live="polite">Informe uma taxa anual hipotética e calcule a projeção.</p>
-                            <p class="text-xs text-slate-400">A mesma variação é repetida hipoteticamente todos os anos e aplicada mensalmente ao saldo devedor. Não é previsão de índice futuro, CET ou condição contratual. Confirme o indexador no contrato.</p>
-                            <div style="display:none" aria-hidden="true">
-                                <input id="encargosAutomaticos" type="checkbox" checked />
-                                <p id="perfilEncargosBanco"></p>
-                                <input id="trMensal" value="0" />
-                                <input id="iofFin" value="0" />
-                                <input id="seguroFin" value="0" />
-                                <input id="tarifasFin" value="0" />
-                                <input id="encargosFin" value="0" />
-                            </div>
-                        </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Sistema de amortização</label>
                             <select id="sistemaFin" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
@@ -357,7 +331,7 @@
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Parcela inicial:</span> <strong id="valParcBanco">R$ 0</strong></div>
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Última parcela (estimada):</span> <strong id="valUltParcBanco">R$ 0</strong></div>
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Total de juros:</span> <strong id="valJurosBanco" class="text-red-400">R$ 0</strong></div>
-                            <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Encargos adicionais estimados:</span><strong id="valEncargosFin" class="text-amber-200">R$ 0</strong></div>
+                            <div class="py-2 border-b border-slate-800 text-xs text-amber-200 leading-relaxed">Os bancos possuem encargos e taxas. Consulte o seu banco para ter uma precisão melhor.</div>
                             <div class="flex justify-between py-1 pt-1"><span class="text-slate-400">Custo Total (Entrada + Parcelas):</span> <strong id="valCustoBanco" class="text-white">R$ 0</strong></div>
                         </div>
                     </div>
@@ -489,11 +463,6 @@
             campo.value = taxa.toFixed(2);
             nota.textContent = 'Estimativa ilustrativa: referência '+base.toFixed(2)+'% a.a. '+(ajuste>=0?'+ ':'− ')+Math.abs(ajuste).toFixed(2)+' p.p. por entrada/prazo = '+taxa.toFixed(2)+'% a.a. Não é oferta, política oficial ou CET.';
         }
-        function atualizarPerfilEncargosBanco() {
-            for(const id of ['trMensal','iofFin','seguroFin','tarifasFin','encargosFin']){
-                document.getElementById(id).value='0';
-            }
-        }
         function selecionarBanco() {
             const banco = document.getElementById('bancoFin').value;
             const campo = document.getElementById('jurosBanco');
@@ -508,7 +477,6 @@
                 campo.readOnly = false; // permite ajuste fino conforme perfil e proposta
                 nota.textContent = 'Referência BCB: setembro/2026, PF, imobiliário de mercado, taxa + TR. Média de operações, não oferta nem CET; seguros e tarifas não incluídos.';
             }
-            atualizarPerfilEncargosBanco();
             atualizarTaxaCenario();
             calcular();
         }
@@ -533,7 +501,6 @@
                 taxaBaseSelecionada = taxasBancosAuto[banco];
                 nota.textContent = 'Referência de aquisição de veículos PF, janela de 02/11/2026 (média contratada convertida em taxa anual). Não é oferta ou CET; valor editável.';
             }
-            atualizarPerfilEncargosBanco();
             atualizarTaxaCenario();
             calcular();
         }
@@ -550,8 +517,7 @@
                 selecionarBancoAuto();
             } else {
                 seletor.value = 'manual';
-                atualizarPerfilEncargosBanco();
-            }
+                }
         }
         function mudarProduto() {
             const prod = document.getElementById('produto').value;
@@ -695,29 +661,8 @@
             const principalFin=Math.max(0,credito-valorEntrada);
             const jurosAA=Math.max(0,num('jurosBanco',0));
             const sistema=document.getElementById('sistemaFin').value;
-            if(document.getElementById('encargosAutomaticos').checked)atualizarPerfilEncargosBanco();
-            const trMensal=produto==='imovel'?Math.max(0,num('trMensal',0)):0;
-            const indiceFin=document.getElementById('indiceCorrecaoFin').value;
-            const taxaIndiceFin=indiceFin==='nenhum'||produto!=='imovel'?0:Math.max(0,num('taxaIndiceFin',0));
-            const correcaoMensal=(Math.pow(1+taxaIndiceFin/100,1/12)-1)*100;
-            const finSemIndice=calcularFinanciamento(principalFin,jurosAA,prazoFin,sistema,0);
-            const fin=calcularFinanciamento(principalFin,jurosAA,prazoFin,sistema,correcaoMensal);
-            const painelReajuste=document.getElementById('painelReajusteFin');
-            painelReajuste.style.display=produto==='imovel'?'block':'none';
-            const adicionalIndice=Math.max(0,fin.total-finSemIndice.total);
-            const fmtIndice=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-            document.getElementById('resultadoCorrecaoFin').textContent=produto==='imovel'
-                ?'Acréscimo projetado pela correção: '+fmtIndice(adicionalIndice)+
-                 ' | Total das parcelas sem índice: '+fmtIndice(finSemIndice.total)+
-                 ' | Com índice: '+fmtIndice(fin.total)+
-                 ' | Primeira parcela: '+fmtIndice(fin.primeira)+
-                 ' | Última parcela: '+fmtIndice(fin.ultima)+'.'
-                :'Projeção de índice disponível apenas para financiamento imobiliário.';
-            const iofFin=Math.max(0,num('iofFin',0));
-            const tarifasFin=Math.max(0,num('tarifasFin',0));
-            const seguroFin=Math.max(0,num('seguroFin',0));
-            const encargosMensaisFin=Math.max(0,num('encargosFin',0));
-            const encargosAdicionaisFin=iofFin+tarifasFin+(seguroFin+encargosMensaisFin)*prazoFin;
+            const fin=calcularFinanciamento(principalFin,jurosAA,prazoFin,sistema,0);
+            const encargosAdicionaisFin=0; // Despesas bancárias não estimadas nem incluídas.
             const custoFin=valorEntrada+fin.total+encargosAdicionaisFin;
             const diferenca=custoFin-desembolsoCons;
             const fmtPct=(v)=>`${v.toLocaleString('pt-BR',{maximumFractionDigits:2})}%`;
@@ -727,7 +672,6 @@
             document.getElementById('valParcBanco').textContent=fmt(fin.primeira+seguroFin+encargosMensaisFin);
             document.getElementById('valUltParcBanco').textContent=fmt(fin.ultima+seguroFin+encargosMensaisFin);
             document.getElementById('valJurosBanco').textContent=fmt(fin.juros);
-            document.getElementById('valEncargosFin').textContent=fmt(encargosAdicionaisFin);
             document.getElementById('valCustoBanco').textContent=fmt(custoFin);
             const linhaAntecipacao=document.getElementById('linhaAntecipacaoResumo');
             const prazoTabela=planoSelecionado?.prazos.indexOf(prazoCons)??-1;
@@ -986,7 +930,6 @@
             document.getElementById('prazoConsorcio').addEventListener('input',sincronizarPrazoPatrimonial);
             document.getElementById('vincularPrazoPatrimonial').addEventListener('change',sincronizarPrazoPatrimonial);
             consultarIndices();
-            for(const id of ['indiceCorrecaoFin','taxaIndiceFin'])document.getElementById(id).addEventListener('input',calcular);
             document.getElementById('entradaPct').addEventListener('input', calcular);
             document.getElementById('prazoFin').addEventListener('input', calcular);
             document.getElementById('ajustarTaxaCenario').addEventListener('change', calcular);
@@ -1007,7 +950,6 @@
                 if(el)el.addEventListener('change',()=>{atualizarPerfilEncargosBanco();calcular();});
             }
             // Atualiza os valores visíveis também no primeiro carregamento.
-            atualizarPerfilEncargosBanco();
             calcular();
         };
 
