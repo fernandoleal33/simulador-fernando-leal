@@ -637,7 +637,7 @@
                 prazoRestante=Math.min(mesesDepois,prazoRestante);
                 reducaoMeses=mesesDepois-prazoRestante;
             }
-            const totalParcelasCons= pagoAntes + parcelaPos*prazoRestante;
+            const totalParcelasCons= pagoAntes + Math.min(saldoDepoisLance,parcelaPos*prazoRestante); // última parcela pode ser menor no abatimento por prazo
             const desembolsoCons=totalParcelasCons+lanceProprioAplicado;
             const valorEntradaPct=Math.max(0,Math.min(100,num('entradaPct',0)));
             const valorEntrada=credito*valorEntradaPct/100;
