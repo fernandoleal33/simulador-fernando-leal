@@ -9,6 +9,7 @@
     <meta name="apple-mobile-web-app-title" content="Simulador">
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" type="image/svg+xml" href="./icon.svg">
+    <link rel="apple-touch-icon" href="./icon.svg">
     <title>Fernando Leal | Consultor Unifisa — Planejamento e Consórcio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -46,6 +47,10 @@
   .fl-simulator-intro { max-width:1180px; margin:0 auto; padding:35px 22px 8px; }
   .fl-simulator-intro h2 { color:#fff; font-size:clamp(26px,3vw,38px); margin:0 0 10px; }
   .fl-simulator-intro p { color:#b8c9dc; line-height:1.6; margin:0; }
+  .fl-install { max-width:1180px; margin:22px auto; padding:18px 22px; border:1px solid #294564; border-radius:14px; background:#0c2543; color:#eaf1fa; }
+  .fl-install h3 { margin:0 0 9px; font-size:17px; }
+  .fl-install p { margin:7px 0; line-height:1.6; font-size:13px; color:#d1e0f2; }
+  .fl-install button { border:0; background:#f4c542; color:#10233c; font-weight:800; border-radius:9px; padding:11px 16px; cursor:pointer; }
   .fl-disclaimer { max-width:1180px; margin:20px auto 35px; padding:0 22px; color:#9fb2c9; font-size:11px; line-height:1.6; }
   .fl-footer { padding:28px 20px; text-align:center; color:#aebfd3; background:#041225; border-top:1px solid #1e3858; font-size:12px; line-height:1.7; }
   @media(max-width:800px) {
@@ -961,6 +966,13 @@
 
     </script>
 
+<section class="fl-install" aria-label="Instalar aplicativo">
+  <h3>Instale o simulador no celular</h3>
+  <p><strong>Android:</strong> abra esta página no Chrome, toque no menu (⋮) e escolha “Instalar aplicativo” ou “Adicionar à tela inicial”.</p>
+  <p><strong>iPhone:</strong> abra no Safari, toque em Compartilhar e escolha “Adicionar à Tela de Início”. Ative “Abrir como App”, se aparecer.</p>
+  <button id="botaoInstalarPWA" type="button" hidden>Instalar aplicativo</button>
+  <p id="statusInstalacaoPWA" aria-live="polite"></p>
+</section>
 <div class="fl-disclaimer">
   Simulação matemática ilustrativa em valores nominais e sem projeção de reajustes futuros do crédito ou das parcelas. A taxa de administração e o fundo de reserva devem ser informados como percentuais totais do plano, conforme proposta/contrato; o seguro foi simplificado como percentual mensal fixo sobre o crédito mais administração e fundo de reserva, sem reajustes futuros. A forma de aplicação do lance, a ordem de amortização, os limites de lance embutido, a parcela reduzida, os índices de correção, seguros, tarifas e demais encargos variam conforme grupo e contrato. A contemplação no mês escolhido é apenas uma hipótese matemática, nunca uma promessa. No financiamento, a taxa informada não substitui o CET; seguros, tarifas, tributos e demais custos podem alterar o resultado. Este simulador não substitui proposta oficial, regulamento ou análise da administradora/instituição financeira.
 </div>
@@ -970,6 +982,26 @@
 </footer>
 
 <script>
+  let eventoInstalacaoPWA=null;
+  const botaoInstalar=document.getElementById('botaoInstalarPWA');
+  window.addEventListener('beforeinstallprompt',event=>{
+    event.preventDefault();
+    eventoInstalacaoPWA=event;
+    botaoInstalar.hidden=false;
+  });
+  botaoInstalar.addEventListener('click',async()=>{
+    if(!eventoInstalacaoPWA)return;
+    const evento=eventoInstalacaoPWA;
+    eventoInstalacaoPWA=null;
+    botaoInstalar.hidden=true;
+    await evento.prompt();
+    const resultado=await evento.userChoice;
+    document.getElementById('statusInstalacaoPWA').textContent=resultado.outcome==='accepted'?'Instalação solicitada. Confira a tela inicial.':'Você pode instalar pelo menu do navegador.';
+  });
+  window.addEventListener('appinstalled',()=>{
+    botaoInstalar.hidden=true;
+    document.getElementById('statusInstalacaoPWA').textContent='Aplicativo instalado.';
+  });
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js').catch(error => console.warn('PWA indisponível:', error));
