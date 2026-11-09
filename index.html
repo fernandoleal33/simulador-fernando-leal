@@ -320,6 +320,7 @@
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Parcela Pós-Contemplação:</span> <strong id="valParcPos" class="text-emerald-400">R$ 0</strong></div>
                             <div id="linhaAposAntecipacao" class="flex justify-between py-1 border-b border-slate-800" style="display:none"><span class="text-slate-400">Parcela após antecipação (antes da contemplação):</span><strong id="valAposAntecipacao">R$ 0</strong></div>
                             <div id="linhaResumoPlano" class="py-2 text-xs text-slate-300 border-b border-slate-800"></div>
+                            <button type="button" onclick="gerarPropostaPDF()" class="w-full rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-semibold py-2 px-3 text-sm">Gerar proposta em PDF</button>
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Lance com recurso próprio:</span> <strong id="valLanceProprio" class="text-white">R$ 0</strong></div>
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Crédito líquido disponível:</span> <strong id="valCreditoLiquido" class="text-white">R$ 0</strong></div>
                             <div class="flex justify-between py-1 pt-1"><span class="text-slate-400">Desembolso estimado:</span> <strong id="valCustoConsorcio" class="text-white">R$ 0</strong></div>
@@ -712,6 +713,39 @@
             document.getElementById('blocoExplicacaoInvestimento').style.display='none';
             const bancoSelecionado = produto === 'imovel' ? document.getElementById('bancoFin').selectedOptions[0].text : produto === 'auto' ? document.getElementById('bancoAuto').selectedOptions[0].text : 'Taxa personalizada';
             window.__simulacaoAtual={taxaEstimada:document.getElementById('ajustarTaxaCenario').checked && (produto==='imovel' || produto==='auto') && bancoSelecionado!=='Personalizar taxa',produto:produtoEl.options[produtoEl.selectedIndex].text,credito,prazoCons,prazoFin,mesCont,parcelaPre,parcelaPos,lanceLivre:lanceProprioAplicado,lanceEmbutido:embutidoAplicado,creditoLiquido,desembolsoCons,custoFin,diferenca,juros:fin.juros,entrada:valorEntrada,sistema,banco:bancoSelecionado,taxaAnual:jurosAA};
+        }
+        function gerarPropostaPDF() {
+            if(document.getElementById('produto').value==='investimento'){alert('A proposta em PDF está disponível para consórcio e financiamento.');return;}
+            calcular();
+            const s=window.__simulacaoAtual;
+            if(!s||!(s.credito>0)){alert('Informe um crédito válido antes de gerar a proposta.');return;}
+            const produto=document.getElementById('produto').value;
+            const plano=tabelaPlanos[produto]?.[document.getElementById('planoUnifisa').value];
+            const prazo=s.prazoCons;
+            if(plano&&!plano.prazos.includes(prazo)){alert('O prazo não corresponde à tabela selecionada. Ajuste o prazo antes de gerar a proposta.');return;}
+            const adm=Math.max(0,num('taxaAdmAnual',0)),reserva=Math.max(0,num('fundoReservaPct',0));
+            const data=new Date().toLocaleDateString('pt-BR');
+            const linhas=[
+                ['Data da simulação',data],['Consultor',consultorAtual.nome],['Contato',consultorAtual.formatado],
+                ['Segmento',s.produto],['Tabela comercial',plano?.nome||'Personalizada'],
+                ['Crédito de referência',fmt(s.credito)],['Prazo do consórcio',prazo+' meses'],
+                ['Administração total',adm+'%'],['Antecipação da administração',plano?plano.antecipacao+'% em '+plano.mesesAntecipacao+' parcela(s)':'Não especificada'],
+                ['Fundo de reserva',reserva+'%'],['Parcela inicial estimada',fmt(s.parcelaPre)],
+                ['Parcela após contemplação (média estimada)',fmt(s.parcelaPos)],
+                ['Contemplação (hipótese, não garantia)', 'Mês '+s.mesCont],
+                ['Lance com recursos próprios',fmt(s.lanceLivre)],['Lance embutido',fmt(s.lanceEmbutido)],
+                ['Crédito líquido estimado',fmt(s.creditoLiquido)],
+                ['Desembolso nominal estimado do consórcio',fmt(s.desembolsoCons)],
+                ['Banco / referência',s.banco],['Entrada no financiamento',fmt(s.entrada)],
+                ['Taxa anual do financiamento',s.taxaAnual.toFixed(2)+'% a.a. (referência ilustrativa)'],
+                ['Desembolso nominal estimado do financiamento',fmt(s.custoFin)]
+            ];
+            const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+            const w=window.open('','_blank');
+            if(!w){alert('Permita janelas pop-up para salvar a proposta em PDF.');return;}
+            const rows=linhas.map(([k,v])=>'<tr><th>'+esc(k)+'</th><td>'+esc(v)+'</td></tr>').join('');
+            w.document.write('<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Simulação comercial - '+esc(consultorAtual.nome)+'</title><style>body{font:14px Arial,sans-serif;color:#17253a;margin:36px}h1{color:#0b355e}table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:9px;border-bottom:1px solid #ddd}th{width:48%;background:#f2f6fa}p{line-height:1.5}.alerta{margin-top:24px;padding:14px;border:1px solid #d5b15a;background:#fff9e8}@media print{body{margin:12mm}.alerta{break-inside:avoid}}</style></head><body><h1>Simulação comercial — Consórcio x Financiamento</h1><p>Documento ilustrativo para planejamento financeiro.</p><table>'+rows+'</table><div class="alerta"><strong>Condições e limitações</strong><p>Valores nominais, sem projeção de reajustes futuros (INCC/IPCA), e sujeitos às regras contratuais, seguros, tarifas, aprovação de crédito e condições vigentes da administradora e dos bancos. A antecipação integra a taxa de administração, não é taxa adicional. A contemplação por sorteio ou lance não tem data garantida. A parcela após contemplação é uma média estimada, podendo variar conforme antecipações remanescentes, amortização e regras do grupo. As taxas bancárias são referências ilustrativas, não CET nem oferta aprovada. Valide a proposta com a tabela vigente antes da contratação.</p></div><p>Consultor: '+esc(consultorAtual.nome)+' — '+esc(consultorAtual.formatado)+'</p><script>window.onload=()=>window.print()<\/script></body></html>');
+            w.document.close();
         }
         function textoProposta() {
             if(document.getElementById('produto').value==='investimento')return window.propostaIndice||'Calcule a projeção patrimonial antes de compartilhar.';
