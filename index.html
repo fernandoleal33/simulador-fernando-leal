@@ -276,6 +276,7 @@
                         </div>
                         <div class="rounded-lg border border-slate-700 bg-slate-900/60 p-3 space-y-2">
                             <p class="text-xs font-semibold text-amber-200">Encargos adicionais do financiamento (estimativas editáveis)</p>
+                            <p id="perfilEncargosBanco" class="text-xs text-emerald-300" role="status">Selecione o banco para ver os encargos aplicáveis à modalidade.</p>
                             <p class="text-[10px] text-slate-400">TR não é imposto nem taxa fixa: o valor abaixo simula um índice mensal constante. IOF não se aplica automaticamente a todo financiamento; crédito habitacional pode ser isento. Informe valores reais quando disponíveis. Não equivale ao CET oficial.</p>
                             <label class="block text-xs text-slate-300">TR mensal hipotética (%) — imóvel, padrão 0<input type="number" id="trMensal" value="0" min="0" max="5" step="0.01" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white" /></label>
                             <label class="block text-xs text-slate-300">IOF total informado (R$) — padrão 0<input type="number" id="iofFin" value="0" min="0" step="0.01" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white" /></label>
@@ -472,6 +473,24 @@
             campo.value = taxa.toFixed(2);
             nota.textContent = 'Estimativa ilustrativa: referência '+base.toFixed(2)+'% a.a. '+(ajuste>=0?'+ ':'− ')+Math.abs(ajuste).toFixed(2)+' p.p. por entrada/prazo = '+taxa.toFixed(2)+'% a.a. Não é oferta, política oficial ou CET.';
         }
+        function atualizarPerfilEncargosBanco() {
+            const produto=document.getElementById('produto').value;
+            const seletor=produto==='imovel'?document.getElementById('bancoFin'):produto==='auto'?document.getElementById('bancoAuto'):null;
+            const nomeBanco=seletor?.selectedOptions?.[0]?.textContent?.trim()||'Banco personalizado';
+            const perfil=document.getElementById('perfilEncargosBanco');
+            const tr=document.getElementById('trMensal');
+            if(produto==='imovel'){
+                perfil.textContent=nomeBanco+': crédito imobiliário. TR conforme contrato; IOF habitacional normalmente isento; seguro MIP/DFI e tarifas dependem da proposta. Preencha valores confirmados.';
+                tr.disabled=false;
+                document.getElementById('iofFin').value='0';
+            }else if(produto==='auto'){
+                perfil.textContent=nomeBanco+': financiamento de veículo. TR não aplicada neste modelo; IOF pode incidir e depende da operação. Seguros e tarifas variam conforme proposta e CET.';
+                tr.value='0';tr.disabled=true;
+            }else{
+                perfil.textContent='Modalidade personalizada: informe apenas encargos confirmados na proposta bancária.';
+                tr.value='0';tr.disabled=true;
+            }
+        }
         function selecionarBanco() {
             const banco = document.getElementById('bancoFin').value;
             const campo = document.getElementById('jurosBanco');
@@ -486,6 +505,7 @@
                 campo.readOnly = false; // permite ajuste fino conforme perfil e proposta
                 nota.textContent = 'Referência BCB: setembro/2026, PF, imobiliário de mercado, taxa + TR. Média de operações, não oferta nem CET; seguros e tarifas não incluídos.';
             }
+            atualizarPerfilEncargosBanco();
             atualizarTaxaCenario();
             calcular();
         }
@@ -510,6 +530,7 @@
                 taxaBaseSelecionada = taxasBancosAuto[banco];
                 nota.textContent = 'Referência de aquisição de veículos PF, janela de 02/11/2026 (média contratada convertida em taxa anual). Não é oferta ou CET; valor editável.';
             }
+            atualizarPerfilEncargosBanco();
             atualizarTaxaCenario();
             calcular();
         }
@@ -526,6 +547,7 @@
                 selecionarBancoAuto();
             } else {
                 seletor.value = 'manual';
+                atualizarPerfilEncargosBanco();
             }
         }
         function mudarProduto() {
@@ -952,6 +974,18 @@
                 document.getElementById('ajustarTaxaCenario').checked = false;
                 calcular();
             });
+            // Recalcular imediatamente ao digitar, sem exigir troca de campo.
+            const camposImediatos=['mesContemplacao','lanceLivre','lanceEmbutidoPct',
+              'tipoAbatimento','taxaAdmAnual','fundoReservaPct','seguroMensalPct',
+              'sistemaFin','trMensal','iofFin','seguroFin','tarifasFin','encargosFin'];
+            for(const id of camposImediatos){
+                const el=document.getElementById(id);
+                if(el){el.addEventListener('input',calcular);el.addEventListener('change',calcular);}
+            }
+            for(const id of ['bancoFin','bancoAuto']){
+                const el=document.getElementById(id);
+                if(el)el.addEventListener('change',atualizarPerfilEncargosBanco);
+            }
         };
 
     </script>
