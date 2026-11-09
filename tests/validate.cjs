@@ -81,3 +81,11 @@ assert.match(html,/rel="apple-touch-icon" href="\.\/icon-180\.png"/);
 assert.doesNotMatch(html,/atualizarPerfilEncargosBanco/,'Não chamar função de encargos removida');
 assert.match(html,/if\(el\)el\.addEventListener\('change',calcular\)/);
 console.log('Troca de bancos sem chamadas obsoletas verificada.');
+
+assert.ok(tabela.auto.gamma30,'Gamma 30% precisa existir em automóveis');
+assert.deepEqual(Array.from(tabela.auto.gamma30.prazos),[100,80,60]);
+assert.equal(tabela.auto.gamma30.reducao,0.7);
+assert.match(html,/if\(!plano\)\{[^}]*calcular\(\);return;\}/);
+assert.match(html,/el\.addEventListener\('input',aplicarTabelaUnifisa\)/);
+assert.match(html,/document\.getElementById\('prazoFin'\)\.addEventListener\('input', calcular\)/);
+console.log('Gamma 30%, atualização imediata e recálculo do financiamento verificados.');
