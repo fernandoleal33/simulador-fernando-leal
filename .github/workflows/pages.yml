@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Baixar código
         uses: actions/checkout@v4
+      - name: Gerar ícones instaláveis Android e iOS
+        run: python3 scripts/generate_icons.py
       - name: Validar parcelas e salvaguardas
         run: node tests/validate.cjs
       - name: Preparar Pages
