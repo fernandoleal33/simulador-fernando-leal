@@ -3,7 +3,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const html=fs.readFileSync('index.html','utf8');
-const plan=html.match(/const tabelaPlanos\s*=\s*(\{[\s\S]*?\});\s*function atualizarTabelaUnifisa/);
+const plan=html.match(/const tabelaPlanos\s*=\s*(\{[\s\S]*?\});\s*function preencherOpcoesTabela/);
 assert.ok(plan,'Cadastro de planos não encontrado');
 const tabela=Function('"use strict";return ('+plan[1]+')')();
 function parcelaBase(credito,prazo,adm,ant,reducao=1){
