@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Baixar código
         uses: actions/checkout@v4
+      - name: Validar parcelas e salvaguardas
+        run: node tests/validate.cjs
       - name: Preparar Pages
         uses: actions/configure-pages@v5
         with:
