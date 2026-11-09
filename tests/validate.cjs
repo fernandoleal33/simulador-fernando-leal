@@ -63,3 +63,12 @@ assert.match(html,/contemplação não é garantida/i);
 assert.match(html,/Os bancos possuem encargos e taxas\. Consulte o seu banco para ter uma precisão melhor\./);
 assert.doesNotMatch(html,/id="painelReajusteFin"|id="encargosAutomaticos"|id="valEncargosFin"/);
 console.log('Financiamento SAC/Price, campos, aviso e WhatsApp: verificações estáticas e matemáticas OK.');
+
+const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
+assert.equal(manifest.display,'standalone');
+assert.equal(manifest.start_url,'./');
+assert.ok(manifest.icons.some(icon=>icon.src==='./icon.svg'));
+assert.match(html,/rel="manifest" href="\.\/manifest\.webmanifest"/);
+assert.match(html,/serviceWorker\.register\('\.\/sw\.js'\)/);
+assert.ok(fs.existsSync('sw.js')&&fs.existsSync('icon.svg'));
+console.log('Manifesto PWA, ícone e service worker presentes; versão desktop preservada.');
