@@ -219,8 +219,8 @@
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Lance Embutido (% sobre o crédito)</label>
-                            <input type="number" id="lanceEmbutidoPct" value="0" max="30" step="1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                            <p class="text-[10px] text-slate-400 mt-0.5" id="valLanceEmbutidoText">Valor: R$ 0,00</p>
+                            <input type="number" id="lanceEmbutidoPct" value="0" min="0" max="30" step="1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                            <p class="text-[10px] text-slate-400 mt-0.5" id="valLanceEmbutidoText">Valor: R$ 0,00 (0% = sem lance; quando utilizado, de 10% a 30%)</p>
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Como abater o lance contemplado?</label>
@@ -613,9 +613,11 @@
             const pagoAntes=parcelaReduzida*mesesAntes+adicionalInicial*mesesAntecipadosPagos;
             const saldoAntesLance=Math.max(0,totalPlano-pagoAntes);
             const lanceLivre=Math.max(0,parseMoeda(document.getElementById('lanceLivre').value));
-            const embPct=Math.max(0,Math.min(100,num('lanceEmbutidoPct',0)));
+            const embPctBruto=num('lanceEmbutidoPct',0);
+            const embPct=embPctBruto===0?0:Math.max(10,Math.min(30,embPctBruto));
             const lanceEmbutido=credito*embPct/100;
             const lancePretendido=lanceLivre+lanceEmbutido;
+            const percentualLanceCredito=credito>0?Math.min(1,lancePretendido/credito):0;
             const lanceAplicado=Math.min(lancePretendido,saldoAntesLance);
             const lanceProprioAplicado=Math.min(lanceLivre,lanceAplicado);
             const embutidoAplicado=Math.max(0,lanceAplicado-lanceProprioAplicado);
@@ -624,21 +626,24 @@
             const antecipacaoFutura=Math.max(0,totalTaxaAntecipada-adicionalInicial*mesesAntecipadosPagos);
             const mesesFuturosAntecipacao=Math.max(0,mesesTaxaAntecipada-mesesAntecipadosPagos);
             const mensalAntecipacaoFutura=mesesFuturosAntecipacao?antecipacaoFutura/mesesFuturosAntecipacao:0;
-            const saldoSemLance=saldoAntesLance;
-            const parcelaPosSemLance=mesesDepois>0?saldoSemLance/mesesDepois:0;
+            // Regra comercial informada: percentual do lance sobre o crédito total,
+            // mantendo valores próprios e embutidos separados.
+            // A parcela integral usa a base contratual estimada, sem a redução promocional.
+            const parcelaIntegral=parcelaRegular;
             const modoAbate=document.getElementById('tipoAbatimento').value;
             let parcelaPos=0, prazoRestante=0, reducaoMeses=0;
-            if (mesesDepois===0) {
-                parcelaPos=0; prazoRestante=0;
-            } else if (modoAbate==='parcela') {
-                prazoRestante=mesesDepois;
-                parcelaPos=saldoDepoisLance/mesesDepois;
-            } else {
-                parcelaPos=parcelaPosSemLance;
-                prazoRestante=parcelaPos>0?Math.ceil(saldoDepoisLance/parcelaPos):0;
-                prazoRestante=Math.min(mesesDepois,prazoRestante);
-                reducaoMeses=mesesDepois-prazoRestante;
+            if(mesesDepois>0){
+                if(modoAbate==='parcela'){
+                    prazoRestante=mesesDepois;
+                    parcelaPos=Math.max(0,parcelaIntegral*(1-percentualLanceCredito));
+                }else{
+                    prazoRestante=Math.max(0,Math.ceil(mesesDepois*(1-percentualLanceCredito)));
+                    parcelaPos=parcelaIntegral;
+                    reducaoMeses=mesesDepois-prazoRestante;
+                }
             }
+            // O valor após contemplação é ilustrativo; taxas, seguros, reajustes e
+            // saldo efetivo podem exigir recálculo pelo regulamento do grupo.
             const totalParcelasCons= pagoAntes + Math.min(saldoDepoisLance,parcelaPos*prazoRestante); // última parcela pode ser menor no abatimento por prazo
             const desembolsoCons=totalParcelasCons+lanceProprioAplicado;
             const valorEntradaPct=Math.max(0,Math.min(100,num('entradaPct',0)));
