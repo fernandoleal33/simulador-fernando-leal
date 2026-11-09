@@ -318,6 +318,8 @@
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400" id="labelParcPre">Parcela Pré-Contemplação:</span> <strong id="valParcRed">R$ 0</strong></div>
                             <div id="linhaAntecipacaoResumo" class="flex justify-between py-1 border-b border-slate-800" style="display:none"><span class="text-amber-300" id="labelAntecipacaoResumo">Parcela com antecipação:</span><strong id="valAntecipacaoResumo" class="text-amber-200">R$ 0</strong></div>
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Parcela Pós-Contemplação:</span> <strong id="valParcPos" class="text-emerald-400">R$ 0</strong></div>
+                            <div id="linhaAposAntecipacao" class="flex justify-between py-1 border-b border-slate-800" style="display:none"><span class="text-slate-400">Parcela após antecipação (antes da contemplação):</span><strong id="valAposAntecipacao">R$ 0</strong></div>
+                            <div id="linhaResumoPlano" class="py-2 text-xs text-slate-300 border-b border-slate-800"></div>
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Lance com recurso próprio:</span> <strong id="valLanceProprio" class="text-white">R$ 0</strong></div>
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Crédito líquido disponível:</span> <strong id="valCreditoLiquido" class="text-white">R$ 0</strong></div>
                             <div class="flex justify-between py-1 pt-1"><span class="text-slate-400">Desembolso estimado:</span> <strong id="valCustoConsorcio" class="text-white">R$ 0</strong></div>
@@ -617,6 +619,9 @@
             const embutidoAplicado=Math.max(0,lanceAplicado-lanceProprioAplicado);
             const creditoLiquido=Math.max(0,credito-embutidoAplicado);
             const saldoDepoisLance=Math.max(0,saldoAntesLance-lanceAplicado);
+            const antecipacaoFutura=Math.max(0,totalTaxaAntecipada-adicionalInicial*mesesAntecipadosPagos);
+            const mesesFuturosAntecipacao=Math.max(0,mesesTaxaAntecipada-mesesAntecipadosPagos);
+            const mensalAntecipacaoFutura=mesesFuturosAntecipacao?antecipacaoFutura/mesesFuturosAntecipacao:0;
             const saldoSemLance=saldoAntesLance;
             const parcelaPosSemLance=mesesDepois>0?saldoSemLance/mesesDepois:0;
             const modoAbate=document.getElementById('tipoAbatimento').value;
@@ -661,12 +666,17 @@
                 document.getElementById('labelAntecipacaoResumo').textContent=mesesAntecipacao===1?'1ª parcela (com antecipação):':`Primeiras ${mesesAntecipacao} parcelas (com antecipação):`;
                 document.getElementById('valAntecipacaoResumo').textContent=fmt(primeiraComAntecipacao);
             }
+            const aposAntecipacao=document.getElementById('linhaAposAntecipacao');
+            aposAntecipacao.style.display=mesesTaxaAntecipada>1?'flex':'none';
+            document.getElementById('valAposAntecipacao').textContent=fmt(ativarRed?parcelaRegular*fatorReducao:parcelaRegular);
+            const nomePlano=planoSelecionado?.nome||'Personalizada';
+            document.getElementById('linhaResumoPlano').textContent='Tabela: '+nomePlano+' | Administração: '+taxaAdmPct+'% | Antecipação: '+(antecipacaoAtiva?planoSelecionado.antecipacao:0)+'% | Reserva: '+reservaPct+'%';
             document.getElementById('valParcRed').textContent=fmt(parcelaPre);
             document.getElementById('valParcPos').textContent=fmt(parcelaPos);
             document.getElementById('valLanceProprio').textContent=fmt(lanceProprioAplicado);
             document.getElementById('valCreditoLiquido').textContent=fmt(creditoLiquido);
             document.getElementById('valCustoConsorcio').textContent=fmt(desembolsoCons);
-            document.getElementById('labelParcPre').textContent=mesesTaxaAntecipada?`Parcela inicial (primeiros ${mesesTaxaAntecipada} meses):`:(ativarRed?`Parcela reduzida até o mês ${mesCont}:`:'Parcela estimada antes da contemplação:');
+            document.getElementById('labelParcPre').textContent=mesesTaxaAntecipada?`Parcela inicial (com antecipação):`:(ativarRed?`Parcela reduzida até o mês ${mesCont}:`:'Parcela estimada antes da contemplação:');
             document.getElementById('divSubTituloFin').textContent=`Financiamento (${sistema.toUpperCase()})`;
             document.getElementById('cardTitle1').textContent='Diferença estimada de desembolso';
             document.getElementById('cardTitle2').textContent='Crédito líquido no consórcio';
@@ -679,6 +689,8 @@
             if (lanceAplicado>0) impacto=modoAbate==='prazo'?`Redução estimada de ${reducaoMeses} mês(es)`:`Parcela pós-lance: ${fmt(parcelaPos)}`;
             document.getElementById('resPatrimonioFinal').textContent=impacto;
             const aviso=[];
+            if(mesesFuturosAntecipacao>0) aviso.push(`A contemplação foi simulada antes do término da antecipação: restam ${mesesFuturosAntecipacao} parcela(s) com a parcela antecipada de ${fmt(mensalAntecipacaoFutura)} por mês ainda a distribuir. O valor pós-contemplação mostrado é uma média do saldo, não a prestação contratual mês a mês.`);
+            if(ativarRed) aviso.push('Plano de parcela reduzida: o recálculo após a contemplação é uma aproximação e depende das regras contratuais do grupo.');
             if (credito<=0) aviso.push('Informe um valor de crédito maior que zero.');
             if (lancePretendido>saldoAntesLance+0.01) aviso.push('O lance informado supera o saldo estimado após as parcelas anteriores; o simulador limitou o abatimento ao saldo disponível.');
             if (lanceEmbutido>credito*0.30+0.01) aviso.push('Confirme o limite de lance embutido permitido no regulamento do grupo.');
@@ -689,7 +701,7 @@
             const resumo=`<strong>Resumo da simulação (valores nominais, sem reajuste futuro):</strong><br>`+
               `• Crédito contratado: <strong>${fmt(credito)}</strong>; crédito líquido após lance embutido: <strong>${fmt(creditoLiquido)}</strong>.<br>`+
               `• Composição estimada do plano: crédito ${fmt(credito)} + administração ${fmt(totalAdm)} (${fmtPct(taxaAdmPct)}) + reserva ${fmt(totalReserva)} (${fmtPct(reservaPct)}) + seguro estimado ${fmt(totalSeguro)} = <strong>${fmt(totalPlano)}</strong>.<br>`+
-              `• Antes da contemplação: ${mesesAntes} parcela(s) de ${fmt(parcelaPre)}. Lance próprio aplicado: ${fmt(lanceProprioAplicado)}; lance embutido aplicado: ${fmt(embutidoAplicado)}.<br>`+
+              `• Antes da contemplação: ${mesesAntes} mês(es); parcelas calculadas por fase, com total pago de ${fmt(pagoAntes)}. Lance próprio aplicado: ${fmt(lanceProprioAplicado)}; lance embutido aplicado: ${fmt(embutidoAplicado)}.<br>`+
               `• ${reducaoText}<br>`+
               `• Desembolso estimado no consórcio (parcelas + lance com recursos próprios): <strong>${fmt(desembolsoCons)}</strong>.<br>`+
               `• Financiamento ${sistema.toUpperCase()}: entrada ${fmt(valorEntrada)} + parcelas ${fmt(fin.total)}; juros estimados ${fmt(fin.juros)}; desembolso total ${fmt(custoFin)}.<br>`+
