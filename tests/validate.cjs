@@ -77,3 +77,7 @@ console.log('Manifesto PWA, ícone e service worker presentes; versão desktop p
 
 assert.match(html,/id="botaoInstalarPWA"/);
 assert.match(html,/rel="apple-touch-icon" href="\.\/icon-180\.png"/);
+
+assert.doesNotMatch(html,/atualizarPerfilEncargosBanco/,'Não chamar função de encargos removida');
+assert.match(html,/if\(el\)el\.addEventListener\('change',calcular\)/);
+console.log('Troca de bancos sem chamadas obsoletas verificada.');
