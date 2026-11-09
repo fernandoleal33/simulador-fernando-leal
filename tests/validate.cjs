@@ -67,8 +67,13 @@ console.log('Financiamento SAC/Price, campos, aviso e WhatsApp: verificações e
 const manifest=JSON.parse(fs.readFileSync('manifest.webmanifest','utf8'));
 assert.equal(manifest.display,'standalone');
 assert.equal(manifest.start_url,'./');
-assert.ok(manifest.icons.some(icon=>icon.src==='./icon.svg'));
+assert.ok(manifest.icons.some(icon=>icon.src==='./icon-192.png'&&icon.sizes==='192x192'));
+assert.ok(manifest.icons.some(icon=>icon.src==='./icon-512.png'&&icon.sizes==='512x512'));
 assert.match(html,/rel="manifest" href="\.\/manifest\.webmanifest"/);
 assert.match(html,/serviceWorker\.register\('\.\/sw\.js'\)/);
 assert.ok(fs.existsSync('sw.js')&&fs.existsSync('icon.svg'));
+for(const size of [192,512,180])assert.ok(fs.existsSync('icon-'+size+'.png'),'Ícone PNG ausente: '+size);
 console.log('Manifesto PWA, ícone e service worker presentes; versão desktop preservada.');
+
+assert.match(html,/id="botaoInstalarPWA"/);
+assert.match(html,/rel="apple-touch-icon" href="\.\/icon-180\.png"/);
