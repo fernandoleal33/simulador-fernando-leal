@@ -831,7 +831,7 @@
             alphaPlus:{nome:'Alpha Plus',prazos:[80,70,60,50,36],adm:[15,14,13,12,11],antecipacao:4,mesesAntecipacao:1},
             betha:{nome:'Betha',prazos:[80,70,60,50,36,24],adm:[17,16,15,14,13,12],antecipacao:1,mesesAntecipacao:1},
             gamma:{nome:'Gamma',prazos:[80,70,60,50,36,24],adm:[18,17,16,15,14,13],antecipacao:0,mesesAntecipacao:0},
-            gamma30:{nome:'Gamma — reduzida 30%',prazos:[100,80,60],adm:[20,18,16],antecipacao:0,mesesAntecipacao:0,reducao:0.7}
+            gamma30:{nome:'Gamma 30% — parcela reduzida (70% da base)',prazos:[100,80,60],adm:[20,18,16],antecipacao:0,mesesAntecipacao:0,reducao:0.7}
           },
           pesados:{
             alphaPlus:{nome:'Alpha Plus',prazos:[100,80,70,60,50,36],adm:[17,15,14,13,12,11],antecipacao:4,mesesAntecipacao:1},
@@ -854,14 +854,20 @@
           const produto=document.getElementById('produto').value;
           const plano=tabelaPlanos[produto]?.[document.getElementById('planoUnifisa').value];
           const detalhe=document.getElementById('detalheUnifisa');
-          if(!plano){detalhe.textContent='Selecione uma tabela para preencher a taxa administrativa automaticamente; crédito e prazo permanecem manuais.';return;}
-          const prazo=Math.max(1,Number(document.getElementById('prazoConsorcio').value)||1);
+          if(!plano){detalhe.textContent='Selecione uma tabela para preencher a taxa administrativa automaticamente; crédito e prazo permanecem manuais.';calcular();return;}
+          const campoPrazo=document.getElementById('prazoConsorcio');
+          // Ao selecionar um plano, usar um prazo comercial válido sem exigir sair e voltar ao campo.
+          if(!plano.prazos.includes(Number(campoPrazo.value)) && document.activeElement===document.getElementById('planoUnifisa')){
+            campoPrazo.value=plano.prazos[plano.prazos.length-1];
+          }
+          const prazo=Math.max(1,Number(campoPrazo.value)||1);
           const credito=parseMoeda(document.getElementById('credito').value);
           // Correspondência exata com o prazo comercial; não presumir taxas para prazos não tabelados.
           const i=plano.prazos.indexOf(prazo);
           if(i<0){
             detalhe.textContent='O prazo informado não consta na tabela '+plano.nome+'. Ajuste o prazo para um prazo comercial válido; a taxa anterior não será aplicada automaticamente.';
             document.getElementById('taxaAdmAnual').value='';
+            calcular();
             return;
           }
           const adm=plano.adm[i],reserva=2.5,seguro=produto==='imovel'?0.03:0.06;
@@ -935,14 +941,20 @@
             atualizarOpcoesReduzida();
             mudarProduto();
             // Evento de seleção configurado diretamente no campo.
-            for(const id of ['credito','prazoConsorcio'])document.getElementById(id).addEventListener('input',aplicarTabelaUnifisa);
+            for(const id of ['credito','prazoConsorcio']){
+                const el=document.getElementById(id);
+                el.addEventListener('input',aplicarTabelaUnifisa);
+                el.addEventListener('change',aplicarTabelaUnifisa);
+            }
             document.getElementById('indiceOficial').addEventListener('change',atualizarIndice);
             for(const id of ['taxaOficial','anosIndice','valorizacaoIndice'])document.getElementById(id).addEventListener('input',calcularIndice);
             document.getElementById('prazoConsorcio').addEventListener('input',sincronizarPrazoPatrimonial);
             document.getElementById('vincularPrazoPatrimonial').addEventListener('change',sincronizarPrazoPatrimonial);
             consultarIndices();
             document.getElementById('entradaPct').addEventListener('input', calcular);
+            document.getElementById('entradaPct').addEventListener('change', calcular);
             document.getElementById('prazoFin').addEventListener('input', calcular);
+            document.getElementById('prazoFin').addEventListener('change', calcular);
             document.getElementById('ajustarTaxaCenario').addEventListener('change', calcular);
             document.getElementById('jurosBanco').addEventListener('input', () => {
                 document.getElementById('ajustarTaxaCenario').checked = false;
