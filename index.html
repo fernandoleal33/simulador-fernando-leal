@@ -321,6 +321,7 @@
                             <div id="linhaAposAntecipacao" class="flex justify-between py-1 border-b border-slate-800" style="display:none"><span class="text-slate-400">Parcela após antecipação (antes da contemplação):</span><strong id="valAposAntecipacao">R$ 0</strong></div>
                             <div id="linhaResumoPlano" class="py-2 text-xs text-slate-300 border-b border-slate-800"></div>
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Lance com recurso próprio:</span> <strong id="valLanceProprio" class="text-white">R$ 0</strong></div>
+                            <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Lance embutido:</span> <strong id="valLanceEmbutidoResumo" class="text-white">R$ 0</strong></div>
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Crédito líquido disponível:</span> <strong id="valCreditoLiquido" class="text-white">R$ 0</strong></div>
                             <div class="flex justify-between py-1 pt-1"><span class="text-slate-400">Desembolso estimado:</span> <strong id="valCustoConsorcio" class="text-white">R$ 0</strong></div>
                         </div>
@@ -420,18 +421,18 @@
             calcular();
         }
 
-        // Referências do Banco Central: crédito imobiliário PF, taxas reguladas,
-        // pós-fixadas referenciadas em TR, período de 01 a 30/09/2026.
-        // São médias/valores observados na modalidade, não ofertas individuais nem CET.
+        // Referências Banco Central: financiamento imobiliário PF, TAXAS DE MERCADO,
+        // pós-fixadas em TR, setembro/2026. Taxa fixa mais TR, sem CET, seguros e tarifas.
+        // Médias efetivamente contratadas, não cotações individuais nem taxas garantidas.
         const taxasBancosImobiliario = {
-            caixa: 7.98,
-            bradesco: 11.77,
-            santander: 11.85,
-            itau: 11.87,
-            bb: 10.61,
-            inter: 9.66,
-            sicoob: 10.01,
-            sicredi: 10.50
+            caixa: 12.05,
+            bradesco: 12.24,
+            santander: 12.31,
+            itau: 12.14,
+            bb: 14.49,
+            inter: 12.91,
+            sicoob: 10.79,
+            sicredi: 11.56
         };
         let taxaBaseSelecionada = null;
         // Modelo de sensibilidade hipotético: não representa precificação de qualquer instituição.
@@ -473,18 +474,18 @@
                 campo.value = taxasBancosImobiliario[banco].toFixed(2);
                 taxaBaseSelecionada = taxasBancosImobiliario[banco];
                 campo.readOnly = false; // permite ajuste fino conforme perfil e proposta
-                nota.textContent = 'Referência BCB: setembro/2026, PF, imobiliário regulado com TR. Valor editável; não representa taxa aprovada nem CET.';
+                nota.textContent = 'Referência BCB: setembro/2026, PF, imobiliário de mercado, taxa + TR. Média de operações, não oferta nem CET; seguros e tarifas não incluídos.';
             }
             atualizarTaxaCenario();
             calcular();
         }
-        // Valores iniciais ilustrativos para comparação, não cotações oficiais ou atuais.
-        // Bradesco: referência ilustrativa de 1,61% ao mês convertida para taxa efetiva anual.
+        // Aquisição de veículos PF: médias por banco da janela de 02/11/2026,
+        // taxas mensais convertidas para efetivas anuais. Não são ofertas nem CET.
         const taxasBancosAuto = {
-            santander: 24.00,
-            itau: 23.00,
-            pan: 27.00,
-            bv: 26.00,
+            santander: (Math.pow(1.0185, 12) - 1) * 100,
+            itau: (Math.pow(1.0194, 12) - 1) * 100,
+            pan: (Math.pow(1.0285, 12) - 1) * 100,
+            bv: (Math.pow(1.0211, 12) - 1) * 100,
             bradesco: (Math.pow(1.0161, 12) - 1) * 100
         };
         function selecionarBancoAuto() {
@@ -497,7 +498,7 @@
             } else {
                 campo.value = taxasBancosAuto[banco].toFixed(2);
                 taxaBaseSelecionada = taxasBancosAuto[banco];
-                nota.textContent = 'Referência ilustrativa editável, não taxa vigente ou aprovada. Verifique condições e CET com o banco.';
+                nota.textContent = 'Referência de aquisição de veículos PF, janela de 02/11/2026 (média contratada convertida em taxa anual). Não é oferta ou CET; valor editável.';
             }
             atualizarTaxaCenario();
             calcular();
@@ -682,6 +683,7 @@
             document.getElementById('valParcRed').textContent=fmt(parcelaPre);
             document.getElementById('valParcPos').textContent=fmt(parcelaPos);
             document.getElementById('valLanceProprio').textContent=fmt(lanceProprioAplicado);
+            document.getElementById('valLanceEmbutidoResumo').textContent=fmt(embutidoAplicado);
             document.getElementById('valCreditoLiquido').textContent=fmt(creditoLiquido);
             document.getElementById('valCustoConsorcio').textContent=fmt(desembolsoCons);
             document.getElementById('labelParcPre').textContent=mesesTaxaAntecipada?`Parcela inicial (com antecipação):`:(ativarRed?`Parcela reduzida até o mês ${mesCont}:`:'Parcela estimada antes da contemplação:');
