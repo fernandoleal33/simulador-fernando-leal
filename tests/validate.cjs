@@ -89,3 +89,7 @@ assert.match(html,/if\(!plano\)\{[^}]*calcular\(\);return;\}/);
 assert.match(html,/el\.addEventListener\('input',aplicarTabelaUnifisa\)/);
 assert.match(html,/document\.getElementById\('prazoFin'\)\.addEventListener\('input', calcular\)/);
 console.log('Gamma 30%, atualização imediata e recálculo do financiamento verificados.');
+
+assert.match(html,/document\.addEventListener\('DOMContentLoaded',preencherOpcoesTabela\)/);
+for(const key of ['betha','alphaPlus','gamma','omega50','delta50'])assert.ok(tabela.imovel[key],'Plano imobiliário ausente: '+key);
+console.log('Inicialização independente e planos de imóveis conferidos.');
