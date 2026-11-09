@@ -31,3 +31,35 @@ assert.match(html,/condição personalizada \(não homologada\)/);
 assert.doesNotMatch(html,/gerarPropostaPDF|nomeClientePDF|Salvar esta simulação em PDF/);
 assert.match(html,/function gerarLinkConsultor\(\)/);
 console.log('6 referências e salvaguardas de compartilhamento verificadas.');
+
+// Revisão funcional: fórmulas de financiamento, campos de interface e envio.
+const vm=require('node:vm');
+const financiamento=html.match(/function calcularFinanciamento\([\s\S]*?\n        }\n        function calcular\(/);
+assert.ok(financiamento,'Função de financiamento não encontrada');
+const ctx=vm.createContext({});
+vm.runInContext(financiamento[0].replace(/\n        function calcular\($/,''),ctx);
+const sim=ctx.calcularFinanciamento;
+function perto(real,esperado,tol=0.02){assert.ok(Math.abs(real-esperado)<=tol,'Esperado '+esperado+', recebido '+real);}
+for(const sistema of ['sac','price']){
+ const zero=sim(120000,0,120,sistema,0);
+ perto(zero.primeira,1000);perto(zero.ultima,1000);perto(zero.total,120000);perto(zero.juros,0);
+ const caso=sim(240000,12,360,sistema,0);
+ assert.ok(caso.total>240000 && caso.juros>0,'Juros positivos: '+sistema);
+ perto(caso.total,240000+caso.juros);
+ if(sistema==='sac')assert.ok(caso.primeira>caso.ultima,'SAC decrescente');
+ else perto(caso.primeira,caso.ultima);
+}
+const sac=sim(240000,12,360,'sac',0);
+const price=sim(240000,12,360,'price',0);
+assert.ok(sac.total<price.total,'SAC deve ter juros totais menores nas mesmas condições');
+assert.deepEqual(Object.keys(sim(0,12,360,'sac')).sort(),['juros','primeira','total','ultima']);
+for(const id of ['produto','credito','prazoConsorcio','prazoFin','entradaPct','sistemaFin','bancoFin','bancoAuto','indiceOficial','resultadoIndice','valCustoBanco','telefoneBotao','linkGerado']){
+ assert.ok(html.includes('id="'+id+'"'),'Campo ausente: '+id);
+}
+assert.match(html,/function enviarWhatsApp\(\)/);
+assert.match(html,/https:\/\/wa\.me\/'\+consultorAtual\.numero/);
+assert.match(html,/encodeURIComponent\(textoProposta\(\)\)/);
+assert.match(html,/contemplação não é garantida/i);
+assert.match(html,/Os bancos possuem encargos e taxas\. Consulte o seu banco para ter uma precisão melhor\./);
+assert.doesNotMatch(html,/id="painelReajusteFin"|id="encargosAutomaticos"|id="valEncargosFin"/);
+console.log('Financiamento SAC/Price, campos, aviso e WhatsApp: verificações estáticas e matemáticas OK.');
