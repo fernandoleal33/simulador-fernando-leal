@@ -294,6 +294,8 @@
                         </div>
                     </div>
 
+                    <button type="button" onclick="calcularEncargosFinanciamento()" class="w-full bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold py-3 rounded-xl transition mt-2">Calcular taxas do financiamento</button>
+                    <p id="statusCalculoEncargos" class="text-xs text-amber-200" role="status" aria-live="polite">Clique para preencher as estimativas de encargos e atualizar o financiamento.</p>
                     <!-- Botão de Calcular Explícito -->
                     <button onclick="calcular()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-emerald-950 mt-4">
                         Calcular Simulação Completa
@@ -512,6 +514,19 @@
             }
             const valores='TR '+campos.trMensal.toFixed(2)+'% | IOF R$ '+campos.iofFin.toFixed(2)+' | Seguro R$ '+campos.seguroFin.toFixed(2)+'/mês';
             perfil.textContent+=' Preenchimento automático: '+valores+'. Campos em zero indicam custo não estimado ou não aplicável, e não ausência garantida de cobrança.';
+        }
+        function calcularEncargosFinanciamento() {
+            const automatico=document.getElementById('encargosAutomaticos');
+            automatico.checked=true;
+            atualizarPerfilEncargosBanco();
+            calcular();
+            const produto=document.getElementById('produto').value;
+            const fmtValor=v=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            const seguro=Number(document.getElementById('seguroFin').value)||0;
+            const iof=Number(document.getElementById('iofFin').value)||0;
+            document.getElementById('statusCalculoEncargos').textContent=
+                'Estimativas recalculadas: seguro mensal '+fmtValor(seguro)+
+                ', IOF '+fmtValor(iof)+'. Encargos sem dados confirmados podem permanecer em zero; não equivalem ao CET.';
         }
         function selecionarBanco() {
             const banco = document.getElementById('bancoFin').value;
