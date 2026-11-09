@@ -607,9 +607,10 @@
             const totalTaxaAntecipada=antecipacaoAtiva?credito*planoSelecionado.antecipacao/100:0;
             const parcelaRegular=(totalPlano-totalTaxaAntecipada)/prazoCons;
             const adicionalInicial=mesesTaxaAntecipada?totalTaxaAntecipada/mesesTaxaAntecipada:0;
-            const parcelaPre=(ativarRed?parcelaRegular*fatorReducao:parcelaRegular)+adicionalInicial;
+            const parcelaReduzida=ativarRed?((credito+totalAdm+totalReserva)/prazoCons*fatorReducao+totalSeguro/prazoCons-totalTaxaAntecipada/prazoCons):parcelaRegular;
+            const parcelaPre=parcelaReduzida+adicionalInicial;
             const mesesAntecipadosPagos=Math.min(mesesAntes,mesesTaxaAntecipada);
-            const pagoAntes=(ativarRed?parcelaRegular*fatorReducao:parcelaRegular)*mesesAntes+adicionalInicial*mesesAntecipadosPagos;
+            const pagoAntes=parcelaReduzida*mesesAntes+adicionalInicial*mesesAntecipadosPagos;
             const saldoAntesLance=Math.max(0,totalPlano-pagoAntes);
             const lanceLivre=Math.max(0,parseMoeda(document.getElementById('lanceLivre').value));
             const embPct=Math.max(0,Math.min(100,num('lanceEmbutidoPct',0)));
@@ -669,7 +670,7 @@
             }
             const aposAntecipacao=document.getElementById('linhaAposAntecipacao');
             aposAntecipacao.style.display=mesesTaxaAntecipada>1?'flex':'none';
-            document.getElementById('valAposAntecipacao').textContent=fmt(ativarRed?parcelaRegular*fatorReducao:parcelaRegular);
+            document.getElementById('valAposAntecipacao').textContent=fmt(parcelaReduzida);
             const nomePlano=planoSelecionado?.nome||'Personalizada';
             document.getElementById('linhaResumoPlano').textContent='Tabela: '+nomePlano+' | Administração: '+taxaAdmPct+'% | Antecipação: '+(antecipacaoAtiva?planoSelecionado.antecipacao:0)+'% | Reserva: '+reservaPct+'%';
             document.getElementById('valParcRed').textContent=fmt(parcelaPre);
@@ -691,7 +692,7 @@
             document.getElementById('resPatrimonioFinal').textContent=impacto;
             const aviso=[];
             if(mesesFuturosAntecipacao>0) aviso.push(`A contemplação foi simulada antes do término da antecipação: restam ${mesesFuturosAntecipacao} parcela(s) com a parcela antecipada de ${fmt(mensalAntecipacaoFutura)} por mês ainda a distribuir. O valor pós-contemplação mostrado é uma média do saldo, não a prestação contratual mês a mês.`);
-            if(ativarRed) aviso.push('Plano de parcela reduzida: a composição exata da parcela inicial e o recálculo após contemplação ainda precisam ser conciliados com os valores da tabela oficial; os valores são aproximações.');
+            if(ativarRed) aviso.push('Parcela reduzida calculada sobre fundo comum, administração e reserva, mantendo seguro integral; recálculo após contemplação é uma estimativa sem reajustes.');
             if(document.getElementById('planoUnifisa').value==='gamma12') aviso.push('Gamma 12: não foi localizada tabela própria no PDF oficial fornecido. Os valores não estão homologados.');
             if (credito<=0) aviso.push('Informe um valor de crédito maior que zero.');
             if (lancePretendido>saldoAntesLance+0.01) aviso.push('O lance informado supera o saldo estimado após as parcelas anteriores; o simulador limitou o abatimento ao saldo disponível.');
@@ -724,7 +725,9 @@
             const plano=tabelaPlanos[produto]?.[document.getElementById('planoUnifisa').value];
             const prazo=s.prazoCons;
             if(plano&&!plano.prazos.includes(prazo)){alert('O prazo não corresponde à tabela selecionada. Ajuste o prazo antes de gerar a proposta.');return;}
-            if(plano){alert('Proposta comercial bloqueada temporariamente para tabelas automáticas: estamos conferindo as parcelas com a tabela oficial da administradora. Use apenas como simulação interna até a homologação.');return;}
+            if(!plano||produto!=='imovel'||!['alphaPlus','betha','gamma','omega50','delta50'].includes(document.getElementById('planoUnifisa').value)){alert('PDF disponível apenas para tabelas de imóveis conferidas com o documento de referência. Outras opções permanecem para simulação interna.');return;}
+            if(s.lanceLivre>0||s.lanceEmbutido>0){alert('Para gerar o PDF de referência, retire os lances. Cenários com lance exigem validação contratual individual.');return;}
+            if(!(s.credito>=110000&&s.credito<=400000)){alert('O PDF de referência está limitado a créditos entre R$ 110 mil e R$ 400 mil, conforme a tabela de imóveis fornecida.');return;}
             const adm=Math.max(0,num('taxaAdmAnual',0)),reserva=Math.max(0,num('fundoReservaPct',0));
             const data=new Date().toLocaleDateString('pt-BR');
             const linhas=[
@@ -878,11 +881,12 @@
           const ant=credito*plano.antecipacao/100;
           const meses=plano.mesesAntecipacao;
           const mensal=(total-ant)/prazo;
-          const comAnt=mensal+(meses?ant/meses:0);
+          const mensalReduzido=plano.reducao?((credito*(1+(adm+reserva)/100)/prazo)*plano.reducao+credito*(1+(adm+reserva)/100)*seguro/100-ant/prazo):mensal;
+          const comAnt=mensalReduzido+(meses?ant/meses:0);
           detalhe.replaceChildren();
           const itens=[
             'Taxa administrativa total: '+adm+'% | Antecipação: '+plano.antecipacao+'%'+(meses?' distribuída em '+meses+' mês(es)':'')+' | Fundo de reserva: '+reserva+'%',
-            ...(credito>0?['Parcela estimada com antecipação: '+fmt(comAnt),'Parcela estimada após antecipação: '+fmt(mensal)]:[]),
+            ...(credito>0?['Parcela estimada com antecipação: '+fmt(comAnt),'Parcela estimada após antecipação: '+fmt(mensalReduzido)]:[]),
             'Valores ilustrativos, sem reajustes. '+(plano.nota||'Confirme as condições contratuais da cota.')
           ];
           for(const t of itens){const linha=document.createElement('p');linha.textContent=t;detalhe.appendChild(linha);}
@@ -956,7 +960,7 @@
     </script>
 
 <div class="fl-disclaimer">
-  Simulação matemática ilustrativa em valores nominais e sem projeção de reajustes futuros do crédito ou das parcelas. A taxa de administração e o fundo de reserva devem ser informados como percentuais totais do plano, conforme proposta/contrato; o seguro foi simplificado como percentual mensal fixo sobre o crédito original. A forma de aplicação do lance, a ordem de amortização, os limites de lance embutido, a parcela reduzida, os índices de correção, seguros, tarifas e demais encargos variam conforme grupo e contrato. A contemplação no mês escolhido é apenas uma hipótese matemática, nunca uma promessa. No financiamento, a taxa informada não substitui o CET; seguros, tarifas, tributos e demais custos podem alterar o resultado. Este simulador não substitui proposta oficial, regulamento ou análise da administradora/instituição financeira.
+  Simulação matemática ilustrativa em valores nominais e sem projeção de reajustes futuros do crédito ou das parcelas. A taxa de administração e o fundo de reserva devem ser informados como percentuais totais do plano, conforme proposta/contrato; o seguro foi simplificado como percentual mensal fixo sobre o crédito mais administração e fundo de reserva, sem reajustes futuros. A forma de aplicação do lance, a ordem de amortização, os limites de lance embutido, a parcela reduzida, os índices de correção, seguros, tarifas e demais encargos variam conforme grupo e contrato. A contemplação no mês escolhido é apenas uma hipótese matemática, nunca uma promessa. No financiamento, a taxa informada não substitui o CET; seguros, tarifas, tributos e demais custos podem alterar o resultado. Este simulador não substitui proposta oficial, regulamento ou análise da administradora/instituição financeira.
 </div>
 <footer class="fl-footer">
   <strong><span id="nomeRodape">Fernando Leal</span> | Consultor — Unifisa</strong><br>
