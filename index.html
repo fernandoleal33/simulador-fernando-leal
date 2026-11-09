@@ -136,7 +136,7 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-medium text-slate-300 mb-1">Segmento / Produto</label>
-                        <select id="produto" onchange="mudarProduto()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+                        <select id="produto" onchange="preencherOpcoesTabela();mudarProduto()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
                             <option value="imovel">Imóvel (Residencial / Comercial / Planta)</option>
                             <option value="auto">Automóvel Leve</option>
                             <option value="moto">Moto</option>
@@ -542,6 +542,8 @@
                 capital_giro:{pc:60,pf:48,credito:'100.000,00',adm:18,reserva:2,juros:22,entrada:10,mes:6},
                 investimento:{pc:180,pf:180,credito:'500.000,00',adm:18,reserva:2,juros:11.5,entrada:20,mes:6}
             };
+            // Atualizar o menu imediatamente, antes de qualquer cálculo ou chamada externa.
+            preencherOpcoesTabela();
             const p = presets[prod] || presets.imovel;
             document.getElementById('prazoConsorcio').value=p.pc;
             document.getElementById('prazoFin').value=p.pf;
@@ -853,6 +855,8 @@
             const o=document.createElement('option');o.value=chave;o.textContent=p.nome;sel.appendChild(o);
           }
           if(Object.prototype.hasOwnProperty.call(planos,anterior))sel.value=anterior;
+          // Garante que a seleção nunca retenha uma tabela de outro segmento.
+          if(produto==='auto' && !['','alphaPlus','betha','gamma','gamma30'].includes(sel.value))sel.value='';
         }
         function atualizarTabelaUnifisa(){
           preencherOpcoesTabela();
