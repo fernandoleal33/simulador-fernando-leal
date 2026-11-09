@@ -274,16 +274,31 @@
                             <p id="explicacaoTaxaCenario" class="text-xs text-amber-200 mt-2" role="status" aria-live="polite">Ajuste estimado. Confirme condições, elegibilidade e CET com o banco.</p>
                             <p class="text-[10px] text-slate-400 mt-1">Desmarque para informar uma taxa efetiva anual obtida em proposta real. Os ajustes não representam regras oficiais dos bancos.</p>
                         </div>
-                        <div class="rounded-lg border border-slate-700 bg-slate-900/60 p-3 space-y-2">
-                            <p class="text-xs font-semibold text-amber-200">Encargos adicionais do financiamento (estimativas editáveis)</p>
-                            <label class="flex items-center gap-2 text-xs text-emerald-200"><input id="encargosAutomaticos" type="checkbox" checked /> Automático ativado — estimativas calculadas ao selecionar o banco</label>
-                            <p id="perfilEncargosBanco" class="text-xs text-emerald-300" role="status">Selecione o banco para ver os encargos aplicáveis à modalidade.</p>
-                            <p class="text-[10px] text-slate-400">TR não é imposto nem taxa fixa: o valor abaixo simula um índice mensal constante. IOF não se aplica automaticamente a todo financiamento; crédito habitacional pode ser isento. Informe valores reais quando disponíveis. Não equivale ao CET oficial.</p>
-                            <label class="block text-xs text-slate-300">TR mensal hipotética (%) — imóvel, padrão 0<input type="number" id="trMensal" value="0" min="0" max="5" step="0.01" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white" /></label>
-                            <label class="block text-xs text-slate-300">IOF total informado (R$) — padrão 0<input type="number" id="iofFin" value="0" min="0" step="0.01" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white" /></label>
-                            <label class="block text-xs text-slate-300">Seguro mensal estimado (R$) — MIP/DFI ou outro<input type="number" id="seguroFin" value="0" min="0" step="0.01" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white" /></label>
-                            <label class="block text-xs text-slate-300">Tarifas e despesas iniciais vinculadas ao crédito (R$)<input type="number" id="tarifasFin" value="0" min="0" step="0.01" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white" /></label>
-                            <label class="block text-xs text-slate-300">Encargos mensais adicionais (R$)<input type="number" id="encargosFin" value="0" min="0" step="0.01" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white" /></label>
+                        <div class="rounded-lg border border-slate-700 bg-slate-900/60 p-3 space-y-3" id="painelReajusteFin">
+                            <p class="text-sm font-semibold text-amber-200">Projeção de correção do saldo devedor — financiamento imobiliário</p>
+                            <label class="block text-xs text-slate-300">Índice hipotético aplicado ao saldo
+                                <select id="indiceCorrecaoFin" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white">
+                                    <option value="tr">TR (contratos indexados à TR)</option>
+                                    <option value="ipca">IPCA (contratos indexados ao IPCA)</option>
+                                    <option value="incc">INCC (referência de imóveis em construção; não presumir em financiamento bancário)</option>
+                                    <option value="nenhum">Sem correção adicional</option>
+                                </select>
+                            </label>
+                            <label class="block text-xs text-slate-300">Variação anual hipotética do índice (% a.a.)
+                                <input id="taxaIndiceFin" type="number" value="0" min="0" max="100" step="0.01" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white" />
+                            </label>
+                            <button type="button" onclick="calcular()" class="w-full bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold py-3 rounded-xl">Projetar acréscimo no financiamento</button>
+                            <p id="resultadoCorrecaoFin" class="text-xs text-emerald-200" role="status" aria-live="polite">Informe uma taxa anual hipotética e calcule a projeção.</p>
+                            <p class="text-xs text-slate-400">A mesma variação é repetida hipoteticamente todos os anos e aplicada mensalmente ao saldo devedor. Não é previsão de índice futuro, CET ou condição contratual. Confirme o indexador no contrato.</p>
+                            <div style="display:none" aria-hidden="true">
+                                <input id="encargosAutomaticos" type="checkbox" checked />
+                                <p id="perfilEncargosBanco"></p>
+                                <input id="trMensal" value="0" />
+                                <input id="iofFin" value="0" />
+                                <input id="seguroFin" value="0" />
+                                <input id="tarifasFin" value="0" />
+                                <input id="encargosFin" value="0" />
+                            </div>
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Sistema de amortização</label>
@@ -294,8 +309,6 @@
                         </div>
                     </div>
 
-                    <button type="button" onclick="calcularEncargosFinanciamento()" class="w-full bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold py-3 rounded-xl transition mt-2">Calcular taxas do financiamento</button>
-                    <p id="statusCalculoEncargos" class="text-xs text-amber-200" role="status" aria-live="polite">Clique para preencher as estimativas de encargos e atualizar o financiamento.</p>
                     <!-- Botão de Calcular Explícito -->
                     <button onclick="calcular()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-emerald-950 mt-4">
                         Calcular Simulação Completa
@@ -477,56 +490,9 @@
             nota.textContent = 'Estimativa ilustrativa: referência '+base.toFixed(2)+'% a.a. '+(ajuste>=0?'+ ':'− ')+Math.abs(ajuste).toFixed(2)+' p.p. por entrada/prazo = '+taxa.toFixed(2)+'% a.a. Não é oferta, política oficial ou CET.';
         }
         function atualizarPerfilEncargosBanco() {
-            const produto=document.getElementById('produto').value;
-            const seletor=produto==='imovel'?document.getElementById('bancoFin'):produto==='auto'?document.getElementById('bancoAuto'):null;
-            const nomeBanco=seletor?.selectedOptions?.[0]?.textContent?.trim()||'Banco personalizado';
-            const perfil=document.getElementById('perfilEncargosBanco');
-            const automatico=document.getElementById('encargosAutomaticos').checked;
-            const tr=document.getElementById('trMensal');
-            tr.disabled=produto!=='imovel'||automatico;
-            const ids=['trMensal','iofFin','seguroFin','tarifasFin','encargosFin'];
-            for(const id of ids)document.getElementById(id).readOnly=automatico;
-            if(!automatico){
-                perfil.textContent=nomeBanco+': edição manual ativada. Informe os encargos da proposta/CET; não são preenchidos pelo banco.';
-                return;
+            for(const id of ['trMensal','iofFin','seguroFin','tarifasFin','encargosFin']){
+                document.getElementById(id).value='0';
             }
-            const credito=Math.max(0,parseMoeda(document.getElementById('credito').value));
-            const entradaPct=Math.max(0,Math.min(100,num('entradaPct',0)));
-            const principal=credito*(1-entradaPct/100);
-            const meses=Math.max(1,Math.floor(num('prazoFin',1)));
-            const campos={trMensal:0,iofFin:0,seguroFin:0,tarifasFin:0,encargosFin:0};
-            if(produto==='imovel'){
-                // Hipótese genérica de seguro, não tarifa de qualquer banco.
-                // MIP/DFI real depende de idade, imóvel, saldo e contrato.
-                campos.seguroFin=principal*0.0003;
-                perfil.textContent=nomeBanco+': IOF habitacional estimado em zero (quando isento); TR futura não prevista (0%); seguro ilustrativo de 0,03% ao mês sobre o valor financiado. Tarifas sem valor confirmado ficam em zero. NÃO é CET ou cotação.';
-            }else if(produto==='auto'){
-                // IOF meramente ilustrativo para pessoa física: adicional de 0,38%
-                // + alíquota diária hipotética de 0,0082%, limitada a 365 dias.
-                // Não reproduz necessariamente o IOF efetivo de uma operação parcelada.
-                campos.iofFin=principal*(0.0038+0.000082*Math.min(365,meses*30));
-                perfil.textContent=nomeBanco+': IOF ilustrativo para pessoa física (0,38% + 0,0082% ao dia, limitado a 365 dias). O cálculo real depende do fluxo e da legislação; tarifas e seguros não confirmados ficam em zero. NÃO é CET.';
-            }else{
-                perfil.textContent='Modalidade sem referência automática confiável. Encargos desconhecidos permanecem em zero, não significando isenção. Use a proposta/CET.';
-            }
-            for(const [id,v] of Object.entries(campos)){
-                document.getElementById(id).value=v.toFixed(2);
-            }
-            const valores='TR '+campos.trMensal.toFixed(2)+'% | IOF R$ '+campos.iofFin.toFixed(2)+' | Seguro R$ '+campos.seguroFin.toFixed(2)+'/mês';
-            perfil.textContent+=' Preenchimento automático: '+valores+'. Campos em zero indicam custo não estimado ou não aplicável, e não ausência garantida de cobrança.';
-        }
-        function calcularEncargosFinanciamento() {
-            const automatico=document.getElementById('encargosAutomaticos');
-            automatico.checked=true;
-            atualizarPerfilEncargosBanco();
-            calcular();
-            const produto=document.getElementById('produto').value;
-            const fmtValor=v=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-            const seguro=Number(document.getElementById('seguroFin').value)||0;
-            const iof=Number(document.getElementById('iofFin').value)||0;
-            document.getElementById('statusCalculoEncargos').textContent=
-                'Estimativas recalculadas: seguro mensal '+fmtValor(seguro)+
-                ', IOF '+fmtValor(iof)+'. Encargos sem dados confirmados podem permanecer em zero; não equivalem ao CET.';
         }
         function selecionarBanco() {
             const banco = document.getElementById('bancoFin').value;
@@ -731,7 +697,22 @@
             const sistema=document.getElementById('sistemaFin').value;
             if(document.getElementById('encargosAutomaticos').checked)atualizarPerfilEncargosBanco();
             const trMensal=produto==='imovel'?Math.max(0,num('trMensal',0)):0;
-            const fin=calcularFinanciamento(principalFin,jurosAA,prazoFin,sistema,trMensal);
+            const indiceFin=document.getElementById('indiceCorrecaoFin').value;
+            const taxaIndiceFin=indiceFin==='nenhum'||produto!=='imovel'?0:Math.max(0,num('taxaIndiceFin',0));
+            const correcaoMensal=(Math.pow(1+taxaIndiceFin/100,1/12)-1)*100;
+            const finSemIndice=calcularFinanciamento(principalFin,jurosAA,prazoFin,sistema,0);
+            const fin=calcularFinanciamento(principalFin,jurosAA,prazoFin,sistema,correcaoMensal);
+            const painelReajuste=document.getElementById('painelReajusteFin');
+            painelReajuste.style.display=produto==='imovel'?'block':'none';
+            const adicionalIndice=Math.max(0,fin.total-finSemIndice.total);
+            const fmtIndice=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+            document.getElementById('resultadoCorrecaoFin').textContent=produto==='imovel'
+                ?'Acréscimo projetado pela correção: '+fmtIndice(adicionalIndice)+
+                 ' | Total das parcelas sem índice: '+fmtIndice(finSemIndice.total)+
+                 ' | Com índice: '+fmtIndice(fin.total)+
+                 ' | Primeira parcela: '+fmtIndice(fin.primeira)+
+                 ' | Última parcela: '+fmtIndice(fin.ultima)+'.'
+                :'Projeção de índice disponível apenas para financiamento imobiliário.';
             const iofFin=Math.max(0,num('iofFin',0));
             const tarifasFin=Math.max(0,num('tarifasFin',0));
             const seguroFin=Math.max(0,num('seguroFin',0));
@@ -1005,7 +986,7 @@
             document.getElementById('prazoConsorcio').addEventListener('input',sincronizarPrazoPatrimonial);
             document.getElementById('vincularPrazoPatrimonial').addEventListener('change',sincronizarPrazoPatrimonial);
             consultarIndices();
-            document.getElementById('encargosAutomaticos').addEventListener('change',()=>{atualizarPerfilEncargosBanco();calcular();});
+            for(const id of ['indiceCorrecaoFin','taxaIndiceFin'])document.getElementById(id).addEventListener('input',calcular);
             document.getElementById('entradaPct').addEventListener('input', calcular);
             document.getElementById('prazoFin').addEventListener('input', calcular);
             document.getElementById('ajustarTaxaCenario').addEventListener('change', calcular);
