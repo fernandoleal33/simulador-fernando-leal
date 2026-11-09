@@ -276,7 +276,7 @@
                         </div>
                         <div class="rounded-lg border border-slate-700 bg-slate-900/60 p-3 space-y-2">
                             <p class="text-xs font-semibold text-amber-200">Encargos adicionais do financiamento (estimativas editáveis)</p>
-                            <label class="flex items-center gap-2 text-xs text-emerald-200"><input id="encargosAutomaticos" type="checkbox" checked /> Preencher automaticamente (estimativas, não tarifas oficiais do banco)</label>
+                            <label class="flex items-center gap-2 text-xs text-emerald-200"><input id="encargosAutomaticos" type="checkbox" checked /> Automático ativado — estimativas calculadas ao selecionar o banco</label>
                             <p id="perfilEncargosBanco" class="text-xs text-emerald-300" role="status">Selecione o banco para ver os encargos aplicáveis à modalidade.</p>
                             <p class="text-[10px] text-slate-400">TR não é imposto nem taxa fixa: o valor abaixo simula um índice mensal constante. IOF não se aplica automaticamente a todo financiamento; crédito habitacional pode ser isento. Informe valores reais quando disponíveis. Não equivale ao CET oficial.</p>
                             <label class="block text-xs text-slate-300">TR mensal hipotética (%) — imóvel, padrão 0<input type="number" id="trMensal" value="0" min="0" max="5" step="0.01" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white" /></label>
@@ -508,8 +508,10 @@
                 perfil.textContent='Modalidade sem referência automática confiável. Encargos desconhecidos permanecem em zero, não significando isenção. Use a proposta/CET.';
             }
             for(const [id,v] of Object.entries(campos)){
-                document.getElementById(id).value=v.toFixed(id==='trMensal'?2:2);
+                document.getElementById(id).value=v.toFixed(2);
             }
+            const valores='TR '+campos.trMensal.toFixed(2)+'% | IOF R$ '+campos.iofFin.toFixed(2)+' | Seguro R$ '+campos.seguroFin.toFixed(2)+'/mês';
+            perfil.textContent+=' Preenchimento automático: '+valores+'. Campos em zero indicam custo não estimado ou não aplicável, e não ausência garantida de cobrança.';
         }
         function selecionarBanco() {
             const banco = document.getElementById('bancoFin').value;
@@ -1006,8 +1008,11 @@
             }
             for(const id of ['bancoFin','bancoAuto']){
                 const el=document.getElementById(id);
-                if(el)el.addEventListener('change',atualizarPerfilEncargosBanco);
+                if(el)el.addEventListener('change',()=>{atualizarPerfilEncargosBanco();calcular();});
             }
+            // Atualiza os valores visíveis também no primeiro carregamento.
+            atualizarPerfilEncargosBanco();
+            calcular();
         };
 
     </script>
