@@ -839,17 +839,25 @@
             gamma:{nome:'Gamma',prazos:[100,80,70,60,50,36,24],adm:[20,18,17,16,15,14,13],antecipacao:0,mesesAntecipacao:0}
           }
         };
-        function atualizarTabelaUnifisa(){
+        function preencherOpcoesTabela(){
           const produto=document.getElementById('produto').value;
           const sel=document.getElementById('planoUnifisa');
           const anterior=sel.value;
+          const planos=tabelaPlanos[produto]||{};
           sel.replaceChildren();
           const livre=document.createElement('option');livre.value='';livre.textContent='Simulação personalizada';sel.appendChild(livre);
-          const planos=tabelaPlanos[produto]||{};
-          for(const [chave,p] of Object.entries(planos)){const o=document.createElement('option');o.value=chave;o.textContent=p.nome;sel.appendChild(o);}
-          if(planos[anterior])sel.value=anterior;
+          for(const [chave,p] of Object.entries(planos)){
+            const o=document.createElement('option');o.value=chave;o.textContent=p.nome;sel.appendChild(o);
+          }
+          if(Object.prototype.hasOwnProperty.call(planos,anterior))sel.value=anterior;
+        }
+        function atualizarTabelaUnifisa(){
+          preencherOpcoesTabela();
           aplicarTabelaUnifisa();
         }
+        // Preenche os planos assim que o HTML estiver pronto, independentemente de
+        // consultas externas ou de outras rotinas executadas no carregamento.
+        document.addEventListener('DOMContentLoaded',preencherOpcoesTabela);
         function aplicarTabelaUnifisa(){
           const produto=document.getElementById('produto').value;
           const plano=tabelaPlanos[produto]?.[document.getElementById('planoUnifisa').value];
