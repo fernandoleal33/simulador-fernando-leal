@@ -596,7 +596,7 @@
             const fatorReducao=modalidade==='red50'?0.50:(modalidade==='red30'?0.70:0.75);
             const totalAdm=credito*taxaAdmPct/100;
             const totalReserva=credito*reservaPct/100;
-            const totalSeguro=credito*(seguroMensalPct/100)*prazoCons; // simplificação: seguro fixo sobre crédito original
+            const totalSeguro=(credito+totalAdm+totalReserva)*(seguroMensalPct/100)*prazoCons; // seguro mensal sobre crédito + administração + reserva, conforme tabela de imóveis
             const totalPlano=credito+totalAdm+totalReserva+totalSeguro;
             const parcelaBase=totalPlano/prazoCons;
             const mesesAntes=mesCont;
@@ -691,7 +691,8 @@
             document.getElementById('resPatrimonioFinal').textContent=impacto;
             const aviso=[];
             if(mesesFuturosAntecipacao>0) aviso.push(`A contemplação foi simulada antes do término da antecipação: restam ${mesesFuturosAntecipacao} parcela(s) com a parcela antecipada de ${fmt(mensalAntecipacaoFutura)} por mês ainda a distribuir. O valor pós-contemplação mostrado é uma média do saldo, não a prestação contratual mês a mês.`);
-            if(ativarRed) aviso.push('Plano de parcela reduzida: o recálculo após a contemplação é uma aproximação e depende das regras contratuais do grupo.');
+            if(ativarRed) aviso.push('Plano de parcela reduzida: a composição exata da parcela inicial e o recálculo após contemplação ainda precisam ser conciliados com os valores da tabela oficial; os valores são aproximações.');
+            if(document.getElementById('planoUnifisa').value==='gamma12') aviso.push('Gamma 12: não foi localizada tabela própria no PDF oficial fornecido. Os valores não estão homologados.');
             if (credito<=0) aviso.push('Informe um valor de crédito maior que zero.');
             if (lancePretendido>saldoAntesLance+0.01) aviso.push('O lance informado supera o saldo estimado após as parcelas anteriores; o simulador limitou o abatimento ao saldo disponível.');
             if (lanceEmbutido>credito*0.30+0.01) aviso.push('Confirme o limite de lance embutido permitido no regulamento do grupo.');
@@ -824,9 +825,11 @@
           imovel:{
             betha:{nome:'Betha',prazos:[200,180,160,140,120,100,80,60],adm:[22,20,19,18,17,16,15,14],antecipacao:2,mesesAntecipacao:1,nota:'Conforme tabela comercial Betha Imóvel (IM - 02 - VBK - 05); validar vigência e condições do grupo.'},
             alphaPlus:{nome:'Alpha Plus',prazos:[200,180,160,140,120,100,80,60],adm:[20,18,18,17,16,15,14,13],antecipacao:4,mesesAntecipacao:1},
-            gamma:{nome:'Gamma',prazos:[200,180,160,140,120,100,80,60],adm:[24,22,22,21,20,18,17,16],antecipacao:1,mesesAntecipacao:1},
-            gamma12:{nome:'Gamma 12',prazos:[200,180,160,140,120,100,80,60],adm:[24,22,22,21,20,18,17,16],antecipacao:1,mesesAntecipacao:12,nota:'Taxas Gamma usadas como referência; confirmar condições próprias da Gamma 12.'},
-            red50:{nome:'Reduzida 50% — sem antecipação (condição informada)',prazos:[200,180,160,140],adm:[25,25,25,25],antecipacao:0,mesesAntecipacao:0,reducao:0.5,nota:'Condição comercial informada: taxa total de 25% e nenhuma antecipação. Confirmar condições da cota.'}
+            gamma:{nome:'Gamma',prazos:[200,180,160,140,120,100,80,60],adm:[24,22,21,20,18,17,16,15],antecipacao:1,mesesAntecipacao:1},
+            gamma12:{nome:'Gamma 12',prazos:[200,180,160,140,120,100,80,60],adm:[24,22,21,20,18,17,16,15],antecipacao:1,mesesAntecipacao:12,nota:'Gamma 12 não localizada na tabela oficial fornecida; taxas Gamma são apenas hipótese, NÃO homologada.'},
+            red50:{nome:'Reduzida 50% — condição personalizada (não homologada)',prazos:[200,180,160,140],adm:[25,25,25,25],antecipacao:0,mesesAntecipacao:0,reducao:0.5,nota:'Condição comercial informada, não identificada nas tabelas oficiais deste PDF.'},
+            omega50:{nome:'Ômega 50% (tabela oficial)',prazos:[200,180,160,140],adm:[22,22,22,21],antecipacao:2,mesesAntecipacao:1,reducao:0.5,nota:'Tabela IM - 05 - DOK - 107. Valores reduzidos sujeitos à regra de composição do seguro e parcelas.'},
+            delta50:{nome:'Delta 50% (tabela oficial)',prazos:[200,180,160,140],adm:[24,24,24,23],antecipacao:1,mesesAntecipacao:1,reducao:0.5,nota:'Tabela IM-05-DDK-106. Valores reduzidos sujeitos à regra de composição do seguro e parcelas.'}
           },
           auto:{
             alphaPlus:{nome:'Alpha Plus',prazos:[80,70,60,50,36],adm:[15,14,13,12,11],antecipacao:4,mesesAntecipacao:1},
@@ -871,7 +874,7 @@
           document.getElementById('seguroMensalPct').value=seguro;
           document.getElementById('ativarReduzida').checked=Boolean(plano.reducao);
           document.getElementById('subBlocoReduzida').style.display='none';
-          const total=credito*(1+(adm+reserva)/100)+credito*seguro/100*prazo;
+          const total=credito*(1+(adm+reserva)/100)+credito*(1+(adm+reserva)/100)*seguro/100*prazo;
           const ant=credito*plano.antecipacao/100;
           const meses=plano.mesesAntecipacao;
           const mensal=(total-ant)/prazo;
