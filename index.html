@@ -274,6 +274,15 @@
                             <p id="explicacaoTaxaCenario" class="text-xs text-amber-200 mt-2" role="status" aria-live="polite">Ajuste estimado. Confirme condições, elegibilidade e CET com o banco.</p>
                             <p class="text-[10px] text-slate-400 mt-1">Desmarque para informar uma taxa efetiva anual obtida em proposta real. Os ajustes não representam regras oficiais dos bancos.</p>
                         </div>
+                        <div class="rounded-lg border border-slate-700 bg-slate-900/60 p-3 space-y-2">
+                            <p class="text-xs font-semibold text-amber-200">Encargos adicionais do financiamento (estimativas editáveis)</p>
+                            <p class="text-[10px] text-slate-400">TR não é imposto nem taxa fixa: o valor abaixo simula um índice mensal constante. IOF não se aplica automaticamente a todo financiamento; crédito habitacional pode ser isento. Informe valores reais quando disponíveis. Não equivale ao CET oficial.</p>
+                            <label class="block text-xs text-slate-300">TR mensal hipotética (%) — imóvel, padrão 0<input type="number" id="trMensal" value="0" min="0" max="5" step="0.01" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white" /></label>
+                            <label class="block text-xs text-slate-300">IOF total informado (R$) — padrão 0<input type="number" id="iofFin" value="0" min="0" step="0.01" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white" /></label>
+                            <label class="block text-xs text-slate-300">Seguro mensal estimado (R$) — MIP/DFI ou outro<input type="number" id="seguroFin" value="0" min="0" step="0.01" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white" /></label>
+                            <label class="block text-xs text-slate-300">Tarifas e despesas iniciais vinculadas ao crédito (R$)<input type="number" id="tarifasFin" value="0" min="0" step="0.01" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white" /></label>
+                            <label class="block text-xs text-slate-300">Encargos mensais adicionais (R$)<input type="number" id="encargosFin" value="0" min="0" step="0.01" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-white" /></label>
+                        </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Sistema de amortização</label>
                             <select id="sistemaFin" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
@@ -331,6 +340,7 @@
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Parcela inicial:</span> <strong id="valParcBanco">R$ 0</strong></div>
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Última parcela (estimada):</span> <strong id="valUltParcBanco">R$ 0</strong></div>
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Total de juros:</span> <strong id="valJurosBanco" class="text-red-400">R$ 0</strong></div>
+                            <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Encargos adicionais estimados:</span><strong id="valEncargosFin" class="text-amber-200">R$ 0</strong></div>
                             <div class="flex justify-between py-1 pt-1"><span class="text-slate-400">Custo Total (Entrada + Parcelas):</span> <strong id="valCustoBanco" class="text-white">R$ 0</strong></div>
                         </div>
                     </div>
@@ -561,20 +571,28 @@
             atualizarOpcoesReduzida();
             calcular();
         }
-        function calcularFinanciamento(principal, taxaAnualPct, meses, sistema) {
+        function calcularFinanciamento(principal, taxaAnualPct, meses, sistema, trMensalPct=0) {
             if (principal <= 0 || meses <= 0) return { primeira:0, ultima:0, juros:0, total:0 };
             const i = Math.pow(1 + Math.max(0,taxaAnualPct)/100, 1/12) - 1; // taxa efetiva mensal equivalente
+            const tr = Math.max(0,trMensalPct)/100;
             let total=0, primeira=0, ultima=0, saldo=principal;
             if (sistema === 'sac') {
-                const amort = principal / meses;
                 for (let m=1; m<=meses; m++) {
-                    const parcela = amort + saldo*i;
-                    if (m===1) primeira=parcela;
-                    ultima=parcela; total+=parcela; saldo=Math.max(0,saldo-amort);
+                    saldo*=1+tr;
+                    const amort=saldo/(meses-m+1);
+                    const parcela=amort+saldo*i;
+                    if(m===1) primeira=parcela;
+                    ultima=parcela;total+=parcela;saldo=Math.max(0,saldo-amort);
                 }
             } else {
-                const parcela = i===0 ? principal/meses : principal*i/(1-Math.pow(1+i,-meses));
-                primeira=parcela; ultima=parcela; total=parcela*meses;
+                for(let m=1;m<=meses;m++){
+                    saldo*=1+tr;
+                    const restantes=meses-m+1;
+                    const parcela=i===0?saldo/restantes:saldo*i/(1-Math.pow(1+i,-restantes));
+                    if(m===1) primeira=parcela;
+                    ultima=parcela;total+=parcela;
+                    saldo=Math.max(0,saldo-(parcela-saldo*i));
+                }
             }
             return { primeira, ultima, juros:Math.max(0,total-principal), total };
         }
@@ -652,16 +670,23 @@
             const principalFin=Math.max(0,credito-valorEntrada);
             const jurosAA=Math.max(0,num('jurosBanco',0));
             const sistema=document.getElementById('sistemaFin').value;
-            const fin=calcularFinanciamento(principalFin,jurosAA,prazoFin,sistema);
-            const custoFin=valorEntrada+fin.total;
+            const trMensal=produto==='imovel'?Math.max(0,num('trMensal',0)):0;
+            const fin=calcularFinanciamento(principalFin,jurosAA,prazoFin,sistema,trMensal);
+            const iofFin=Math.max(0,num('iofFin',0));
+            const tarifasFin=Math.max(0,num('tarifasFin',0));
+            const seguroFin=Math.max(0,num('seguroFin',0));
+            const encargosMensaisFin=Math.max(0,num('encargosFin',0));
+            const encargosAdicionaisFin=iofFin+tarifasFin+(seguroFin+encargosMensaisFin)*prazoFin;
+            const custoFin=valorEntrada+fin.total+encargosAdicionaisFin;
             const diferenca=custoFin-desembolsoCons;
             const fmtPct=(v)=>`${v.toLocaleString('pt-BR',{maximumFractionDigits:2})}%`;
             document.getElementById('valLanceEmbutidoText').textContent=`Valor estimado do lance embutido: ${fmt(lanceEmbutido)} | Crédito líquido: ${fmt(creditoLiquido)}`;
             document.getElementById('valEntradaText').textContent=`Entrada estimada: ${fmt(valorEntrada)} (${fmtPct(valorEntradaPct)})`;
             document.getElementById('valEntradaFin').textContent=`${fmt(valorEntrada)} (${fmtPct(valorEntradaPct)})`;
-            document.getElementById('valParcBanco').textContent=fmt(fin.primeira);
-            document.getElementById('valUltParcBanco').textContent=fmt(fin.ultima);
+            document.getElementById('valParcBanco').textContent=fmt(fin.primeira+seguroFin+encargosMensaisFin);
+            document.getElementById('valUltParcBanco').textContent=fmt(fin.ultima+seguroFin+encargosMensaisFin);
             document.getElementById('valJurosBanco').textContent=fmt(fin.juros);
+            document.getElementById('valEncargosFin').textContent=fmt(encargosAdicionaisFin);
             document.getElementById('valCustoBanco').textContent=fmt(custoFin);
             const linhaAntecipacao=document.getElementById('linhaAntecipacaoResumo');
             const prazoTabela=planoSelecionado?.prazos.indexOf(prazoCons)??-1;
