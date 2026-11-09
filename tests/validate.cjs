@@ -28,5 +28,6 @@ for(const [id,credito,prazo,esperado] of casos){
 }
 assert.match(html,/Gamma 12 não localizada/);
 assert.match(html,/condição personalizada \(não homologada\)/);
-assert.match(html,/PDF disponível apenas para tabelas de imóveis conferidas/);
-console.log('6 referências e 3 salvaguardas verificadas.');
+assert.doesNotMatch(html,/gerarPropostaPDF|nomeClientePDF|Salvar esta simulação em PDF/);
+assert.match(html,/function gerarLinkConsultor\(\)/);
+console.log('6 referências e salvaguardas de compartilhamento verificadas.');
