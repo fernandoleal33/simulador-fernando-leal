@@ -153,7 +153,7 @@
 <p class="text-xs text-slate-400">Selecione a tabela comercial. Informe o valor do crédito e o prazo nos campos abaixo; a taxa e a antecipação serão aplicadas automaticamente.</p>
 <label class="block text-xs">Plano<select id="planoUnifisa" onchange="atualizarTabelaUnifisa()" class="w-full bg-slate-900 border border-slate-600 rounded p-2"><option value="">Simulação personalizada</option></select></label>
 <div id="detalheUnifisa" class="text-xs text-emerald-200 space-y-1" aria-live="polite">Selecione um plano para consultar os valores.</div>
-<p class="text-xs text-amber-200">A antecipação integra a taxa administrativa total, não é uma taxa adicional. A redução não implica contemplação garantida. Confira as condições da cota.</p></div>
+</div>
 
                     <div>
                         <label class="block text-xs font-medium text-slate-300 mb-1">Valor do Crédito / Bem (R$)</label>
@@ -915,13 +915,7 @@
           const mensal=(total-ant)/prazo;
           const mensalReduzido=plano.reducao?((credito*(1+(adm+reserva)/100)/prazo)*plano.reducao+credito*(1+(adm+reserva)/100)*seguro/100-ant/prazo):mensal;
           const comAnt=mensalReduzido+(meses?ant/meses:0);
-          detalhe.replaceChildren();
-          const itens=[
-            'Taxa administrativa total: '+adm+'% | Antecipação: '+plano.antecipacao+'%'+(meses?' distribuída em '+meses+' mês(es)':'')+' | Fundo de reserva: '+reserva+'%',
-            ...(credito>0?['Parcela estimada com antecipação: '+fmt(comAnt),'Parcela estimada após antecipação: '+fmt(mensalReduzido)]:[]),
-            'Valores ilustrativos, sem reajustes. '+(plano.nota||'Confirme as condições contratuais da cota.')
-          ];
-          for(const t of itens){const linha=document.createElement('p');linha.textContent=t;detalhe.appendChild(linha);}
+          detalhe.replaceChildren(); // Os valores ficam apenas no resumo financeiro, evitando duplicidade.
           calcular();
         }
         const consultorPadrao = {nome:'Fernando Leal',numero:'5511947662843'};
