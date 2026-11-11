@@ -703,7 +703,7 @@
             const nomePlano=planoSelecionado?.nome||'Personalizada';
             document.getElementById('linhaResumoPlano').textContent='Tabela: '+nomePlano+' | Administração: '+taxaAdmPct+'% | Antecipação: '+(antecipacaoAtiva?planoSelecionado.antecipacao:0)+'% | Reserva: '+reservaPct+'%';
             if(produto==='imovel'&&prazoCons===240&&planoSelecionado)document.getElementById('linhaResumoPlano').textContent+=' | 240 meses: grupo em formação (simulação com taxa de 200 meses; confirmar condições comerciais).';
-            if(planoSelecionado?.power)document.getElementById('linhaResumoPlano').textContent+=' | Plano Power: referência comercial 2024; confirme vigência e disponibilidade do grupo antes de apresentar proposta.';
+            if(planoSelecionado?.power)document.getElementById('linhaResumoPlano').textContent+=' | Plano Power: confirme vigência e disponibilidade do grupo antes de apresentar proposta.';
             if(produto==='embarcacao'&&planoSelecionado&&!planoSelecionado.power)document.getElementById('linhaResumoPlano').textContent+=' | Tabela náutica Alpha/Betha/Gamma: taxas ilustrativas de Pesados; confirmar tabela específica antes de proposta.';
             if(!prazoPlanoValido)document.getElementById('linhaResumoPlano').textContent='ATENÇÃO: crédito ou prazo fora das condições cadastradas do Plano Power/tabela comercial. Resultados não válidos para proposta.';
             document.getElementById('valParcRed').textContent=fmt(parcelaPre);
@@ -862,16 +862,16 @@
             alphaPlus:{nome:'Alpha Plus — referência de Pesados (confirmar tabela náutica)',prazos:[100,80,70,60,50,36],adm:[17,15,14,13,12,11],antecipacao:4,mesesAntecipacao:1,nota:'Condição ilustrativa baseada na tabela Pesados; confirmar existência e taxas específicas para embarcações.'},
             betha:{nome:'Betha — referência de Pesados (confirmar tabela náutica)',prazos:[100,80,70,60,50,36,24],adm:[19,17,16,15,14,13,12],antecipacao:1,mesesAntecipacao:1,nota:'Condição ilustrativa baseada na tabela Pesados; confirmar existência e taxas específicas para embarcações.'},
             gamma:{nome:'Gamma — referência de Pesados (confirmar tabela náutica)',prazos:[100,80,70,60,50,36,24],adm:[20,18,17,16,15,14,13],antecipacao:0,mesesAntecipacao:0,nota:'Condição ilustrativa baseada na tabela Pesados; confirmar existência e taxas específicas para embarcações.'},
-            powerSigma:{nome:'Power — Sigma Náutico (referência 2024)',prazos:[120,100,80,60],adm:[15,15,14,14],antecipacao:1,mesesAntecipacao:1,power:true,nota:'Tabela B2-15-TSA-100 (p. 100), IPCA, referência 2024; confirmar vigência e grupo.'},
-            powerOmega:{nome:'Power — Ômega Náutico (referência 2024)',prazos:[100,80,60],adm:[16,15,15],antecipacao:0,mesesAntecipacao:0,power:true,nota:'Tabela B2-15-TOA-101 (p. 101), IPCA, referência 2024; confirmar vigência e grupo.'}
+            powerSigma:{nome:'Power — Sigma Náutico',prazos:[120,100,80,60],adm:[15,15,14,14],antecipacao:1,mesesAntecipacao:1,power:true,nota:'Tabela B2-15-TSA-100 (p. 100), IPCA; confirmar vigência e grupo.'},
+            powerOmega:{nome:'Power — Ômega Náutico',prazos:[100,80,60],adm:[16,15,15],antecipacao:0,mesesAntecipacao:0,power:true,nota:'Tabela B2-15-TOA-101 (p. 101), IPCA; confirmar vigência e grupo.'}
           },
           luxo:{
-            powerSigma:{nome:'Power — Sigma (referência 2024)',prazos:[120,100,80,60],adm:[15,15,14,14],antecipacao:1,mesesAntecipacao:1,power:true,nota:'Tabela AU-01-TSA-100, referência 2024. Confirmar vigência, grupo e condições.'},
-            powerOmega:{nome:'Power — Ômega (referência 2024)',prazos:[100,80,60],adm:[16,15,15],antecipacao:0,mesesAntecipacao:0,power:true,nota:'Tabela AU-01-TOA-101, referência 2024. Confirmar vigência, grupo e condições.'}
+            powerSigma:{nome:'Power — Sigma',prazos:[120,100,80,60],adm:[15,15,14,14],antecipacao:1,mesesAntecipacao:1,power:true,nota:'Tabela AU-01-TSA-100. Confirmar vigência, grupo e condições.'},
+            powerOmega:{nome:'Power — Ômega',prazos:[100,80,60],adm:[16,15,15],antecipacao:0,mesesAntecipacao:0,power:true,nota:'Tabela AU-01-TOA-101. Confirmar vigência, grupo e condições.'}
           },
           pesados:{
-            powerSigma:{nome:'Power — Sigma (referência 2024)',prazos:[120,100,80,60],adm:[15,15,14,14],antecipacao:1,mesesAntecipacao:1,power:true,nota:'Plano Power para caminhões e máquinas, conforme descrição da página 93. Taxas de referência Sigma automóveis 2024; confirmar tabela específica de pesados antes de proposta.'},
-            powerOmega:{nome:'Power — Ômega (referência 2024)',prazos:[100,80,60],adm:[16,15,15],antecipacao:0,mesesAntecipacao:0,power:true,nota:'Plano Power para caminhões e máquinas, conforme descrição da página 93. Taxas de referência Ômega automóveis 2024; confirmar tabela específica de pesados antes de proposta.'},
+            powerSigma:{nome:'Power — Sigma',prazos:[120,100,80,60],adm:[15,15,14,14],antecipacao:1,mesesAntecipacao:1,power:true,nota:'Plano Power para caminhões e máquinas, conforme descrição da página 93. Taxas de referência Sigma automóveis 2024; confirmar tabela específica de pesados antes de proposta.'},
+            powerOmega:{nome:'Power — Ômega',prazos:[100,80,60],adm:[16,15,15],antecipacao:0,mesesAntecipacao:0,power:true,nota:'Plano Power para caminhões e máquinas, conforme descrição da página 93. Taxas de referência Ômega automóveis 2024; confirmar tabela específica de pesados antes de proposta.'},
             alphaPlus:{nome:'Alpha Plus',prazos:[100,80,70,60,50,36],adm:[17,15,14,13,12,11],antecipacao:4,mesesAntecipacao:1},
             betha:{nome:'Betha',prazos:[100,80,70,60,50,36,24],adm:[19,17,16,15,14,13,12],antecipacao:1,mesesAntecipacao:1},
             gamma:{nome:'Gamma',prazos:[100,80,70,60,50,36,24],adm:[20,18,17,16,15,14,13],antecipacao:0,mesesAntecipacao:0}
