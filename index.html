@@ -141,6 +141,7 @@
                             <option value="auto">Automóvel Leve</option>
                             <option value="moto">Moto</option>
                             <option value="pesados">Pesados (Caminhões, Tratores, Silos)</option>
+                            <option value="luxo">Veículos de Luxo (Plano Power)</option>
                             <option value="embarcacao">Embarcação (Lanchas / Barcos)</option>
                             <option value="servicos">Serviços e Eletrônicos</option>
                             <option value="capital_giro">Capital de Giro (Empresarial)</option>
@@ -537,6 +538,7 @@
                 auto:{pc:60,pf:60,credito:'70.000,00',adm:15,reserva:2,juros:15.5,entrada:30,mes:6},
                 moto:{pc:60,pf:48,credito:'25.000,00',adm:18,reserva:2,juros:18,entrada:20,mes:6},
                 pesados:{pc:120,pf:96,credito:'450.000,00',adm:18,reserva:2,juros:14,entrada:20,mes:18},
+                luxo:{pc:100,pf:72,credito:'200.000,00',adm:15,reserva:2.5,juros:15.5,entrada:30,mes:12},
                 embarcacao:{pc:100,pf:84,credito:'250.000,00',adm:18,reserva:2,juros:15,entrada:20,mes:12},
                 servicos:{pc:48,pf:48,credito:'30.000,00',adm:18,reserva:2,juros:17,entrada:20,mes:6},
                 capital_giro:{pc:60,pf:48,credito:'100.000,00',adm:18,reserva:2,juros:22,entrada:10,mes:6},
@@ -549,14 +551,14 @@
             document.getElementById('prazoFin').value=p.pf;
             document.getElementById('credito').value=p.credito;
             document.getElementById('taxaAdmAnual').value=p.adm;
-            document.getElementById('fundoReservaPct').value=['imovel','auto','pesados'].includes(prod)?2.5:p.reserva;
+            document.getElementById('fundoReservaPct').value=['imovel','auto','pesados','luxo'].includes(prod)?2.5:p.reserva;
             document.getElementById('seguroMensalPct').value=0;
             document.getElementById('jurosBanco').value=p.juros;
             document.getElementById('entradaPct').value=p.entrada;
             atualizarBancoPorProduto(prod);
             atualizarTaxaCenario();
             document.getElementById('painelIndices').style.display=prod==='investimento'?'block':'none';
-            document.getElementById('tabelaUnifisa').style.display=['imovel','auto','pesados'].includes(prod)?'block':'none';
+            document.getElementById('tabelaUnifisa').style.display=['imovel','auto','pesados','luxo'].includes(prod)?'block':'none';
             document.getElementById('planoUnifisa').value='';
             atualizarTabelaUnifisa();
             document.getElementById('ativarReduzida').checked=false;
@@ -612,7 +614,7 @@
             const reservaPct=Math.max(0,num('fundoReservaPct',0));
             const seguroMensalPct=Math.max(0,num('seguroMensalPct',0));
             const planoSelecionado=tabelaPlanos[produto]?.[document.getElementById('planoUnifisa').value];
-            const prazoPlanoValido=!planoSelecionado||planoSelecionado.prazos.includes(prazoCons);
+            const prazoPlanoValido=!planoSelecionado||(planoSelecionado.prazos.includes(prazoCons)&&(!planoSelecionado.power||(credito>=70000&&credito<=300000&&prazoCons<=(credito<100000?80:credito<150000?100:120))));
             const ativarRed=Boolean(planoSelecionado?.reducao);
             const modalidade=planoSelecionado?.reducao===0.5?'red50':planoSelecionado?.reducao===0.7?'red30':'nenhuma';
             const mesCont=Math.max(1,Math.min(prazoCons,Math.floor(num('mesContemplacao',1))));
@@ -701,7 +703,8 @@
             const nomePlano=planoSelecionado?.nome||'Personalizada';
             document.getElementById('linhaResumoPlano').textContent='Tabela: '+nomePlano+' | Administração: '+taxaAdmPct+'% | Antecipação: '+(antecipacaoAtiva?planoSelecionado.antecipacao:0)+'% | Reserva: '+reservaPct+'%';
             if(produto==='imovel'&&prazoCons===240&&planoSelecionado)document.getElementById('linhaResumoPlano').textContent+=' | 240 meses: grupo em formação (simulação com taxa de 200 meses; confirmar condições comerciais).';
-            if(!prazoPlanoValido)document.getElementById('linhaResumoPlano').textContent='ATENÇÃO: prazo fora da tabela comercial; ajuste o prazo. Os resultados exibidos não são válidos para proposta.';
+            if(planoSelecionado?.power)document.getElementById('linhaResumoPlano').textContent+=' | Plano Power: referência comercial 2024; confirme vigência e disponibilidade do grupo antes de apresentar proposta.';
+            if(!prazoPlanoValido)document.getElementById('linhaResumoPlano').textContent='ATENÇÃO: crédito ou prazo fora das condições cadastradas do Plano Power/tabela comercial. Resultados não válidos para proposta.';
             document.getElementById('valParcRed').textContent=fmt(parcelaPre);
             document.getElementById('valParcPos').textContent=fmt(parcelaPos);
             document.getElementById('valLanceProprio').textContent=fmt(lanceProprioAplicado);
@@ -854,7 +857,13 @@
             gamma:{nome:'Gamma',prazos:[80,70,60,50,36,24],adm:[18,17,16,15,14,13],antecipacao:0,mesesAntecipacao:0},
             gamma30:{nome:'Gamma 30% — parcela reduzida (70% da base)',prazos:[100,80,60],adm:[20,18,16],antecipacao:0,mesesAntecipacao:0,reducao:0.7}
           },
+          luxo:{
+            powerSigma:{nome:'Power — Sigma (referência 2024)',prazos:[120,100,80,60],adm:[15,15,14,14],antecipacao:1,mesesAntecipacao:1,power:true,nota:'Tabela AU-01-TSA-100, referência 2024. Confirmar vigência, grupo e condições.'},
+            powerOmega:{nome:'Power — Ômega (referência 2024)',prazos:[100,80,60],adm:[16,15,15],antecipacao:0,mesesAntecipacao:0,power:true,nota:'Tabela AU-01-TOA-101, referência 2024. Confirmar vigência, grupo e condições.'}
+          },
           pesados:{
+            powerSigma:{nome:'Power — Sigma (referência 2024)',prazos:[120,100,80,60],adm:[15,15,14,14],antecipacao:1,mesesAntecipacao:1,power:true,nota:'Plano Power para caminhões e máquinas, conforme descrição da página 93. Taxas de referência Sigma automóveis 2024; confirmar tabela específica de pesados antes de proposta.'},
+            powerOmega:{nome:'Power — Ômega (referência 2024)',prazos:[100,80,60],adm:[16,15,15],antecipacao:0,mesesAntecipacao:0,power:true,nota:'Plano Power para caminhões e máquinas, conforme descrição da página 93. Taxas de referência Ômega automóveis 2024; confirmar tabela específica de pesados antes de proposta.'},
             alphaPlus:{nome:'Alpha Plus',prazos:[100,80,70,60,50,36],adm:[17,15,14,13,12,11],antecipacao:4,mesesAntecipacao:1},
             betha:{nome:'Betha',prazos:[100,80,70,60,50,36,24],adm:[19,17,16,15,14,13,12],antecipacao:1,mesesAntecipacao:1},
             gamma:{nome:'Gamma',prazos:[100,80,70,60,50,36,24],adm:[20,18,17,16,15,14,13],antecipacao:0,mesesAntecipacao:0}
@@ -896,6 +905,11 @@
           }
           const prazo=Math.max(1,Number(campoPrazo.value)||1);
           const credito=parseMoeda(document.getElementById('credito').value);
+          if(plano.power && (credito<70000||credito>300000||prazo>(credito<100000?80:credito<150000?100:120))){
+            detalhe.textContent='Plano Power: crédito de R$ 70.000 a R$ 300.000; até 80 meses para crédito inferior a R$ 100.000, até 100 meses para crédito inferior a R$ 150.000 e até 120 meses para crédito de R$ 150.000 ou mais. Confirme grupo e vigência.';
+            document.getElementById('taxaAdmAnual').value='';
+            calcular();return;
+          }
           // Correspondência exata com o prazo comercial; não presumir taxas para prazos não tabelados.
           const i=plano.prazos.indexOf(prazo);
           if(i<0){
