@@ -539,7 +539,7 @@
                 moto:{pc:60,pf:48,credito:'25.000,00',adm:18,reserva:2,juros:18,entrada:20,mes:6},
                 pesados:{pc:120,pf:96,credito:'450.000,00',adm:18,reserva:2,juros:14,entrada:20,mes:18},
                 luxo:{pc:100,pf:72,credito:'200.000,00',adm:15,reserva:2.5,juros:15.5,entrada:30,mes:12},
-                embarcacao:{pc:100,pf:84,credito:'250.000,00',adm:18,reserva:2,juros:15,entrada:20,mes:12},
+                embarcacao:{pc:100,pf:84,credito:'250.000,00',adm:18,reserva:2.5,juros:15,entrada:20,mes:12},
                 servicos:{pc:48,pf:48,credito:'30.000,00',adm:18,reserva:2,juros:17,entrada:20,mes:6},
                 capital_giro:{pc:60,pf:48,credito:'100.000,00',adm:18,reserva:2,juros:22,entrada:10,mes:6},
                 investimento:{pc:180,pf:180,credito:'500.000,00',adm:18,reserva:2,juros:11.5,entrada:20,mes:6}
@@ -551,14 +551,14 @@
             document.getElementById('prazoFin').value=p.pf;
             document.getElementById('credito').value=p.credito;
             document.getElementById('taxaAdmAnual').value=p.adm;
-            document.getElementById('fundoReservaPct').value=['imovel','auto','pesados','luxo'].includes(prod)?2.5:p.reserva;
+            document.getElementById('fundoReservaPct').value=['imovel','auto','pesados','luxo','embarcacao'].includes(prod)?2.5:p.reserva;
             document.getElementById('seguroMensalPct').value=0;
             document.getElementById('jurosBanco').value=p.juros;
             document.getElementById('entradaPct').value=p.entrada;
             atualizarBancoPorProduto(prod);
             atualizarTaxaCenario();
             document.getElementById('painelIndices').style.display=prod==='investimento'?'block':'none';
-            document.getElementById('tabelaUnifisa').style.display=['imovel','auto','pesados','luxo'].includes(prod)?'block':'none';
+            document.getElementById('tabelaUnifisa').style.display=['imovel','auto','pesados','luxo','embarcacao'].includes(prod)?'block':'none';
             document.getElementById('planoUnifisa').value='';
             atualizarTabelaUnifisa();
             document.getElementById('ativarReduzida').checked=false;
@@ -704,6 +704,7 @@
             document.getElementById('linhaResumoPlano').textContent='Tabela: '+nomePlano+' | Administração: '+taxaAdmPct+'% | Antecipação: '+(antecipacaoAtiva?planoSelecionado.antecipacao:0)+'% | Reserva: '+reservaPct+'%';
             if(produto==='imovel'&&prazoCons===240&&planoSelecionado)document.getElementById('linhaResumoPlano').textContent+=' | 240 meses: grupo em formação (simulação com taxa de 200 meses; confirmar condições comerciais).';
             if(planoSelecionado?.power)document.getElementById('linhaResumoPlano').textContent+=' | Plano Power: referência comercial 2024; confirme vigência e disponibilidade do grupo antes de apresentar proposta.';
+            if(produto==='embarcacao'&&planoSelecionado&&!planoSelecionado.power)document.getElementById('linhaResumoPlano').textContent+=' | Tabela náutica Alpha/Betha/Gamma: taxas ilustrativas de Pesados; confirmar tabela específica antes de proposta.';
             if(!prazoPlanoValido)document.getElementById('linhaResumoPlano').textContent='ATENÇÃO: crédito ou prazo fora das condições cadastradas do Plano Power/tabela comercial. Resultados não válidos para proposta.';
             document.getElementById('valParcRed').textContent=fmt(parcelaPre);
             document.getElementById('valParcPos').textContent=fmt(parcelaPos);
@@ -856,6 +857,13 @@
             betha:{nome:'Betha',prazos:[80,70,60,50,36,24],adm:[17,16,15,14,13,12],antecipacao:1,mesesAntecipacao:1},
             gamma:{nome:'Gamma',prazos:[80,70,60,50,36,24],adm:[18,17,16,15,14,13],antecipacao:0,mesesAntecipacao:0},
             gamma30:{nome:'Gamma 30% — parcela reduzida (70% da base)',prazos:[100,80,60],adm:[20,18,16],antecipacao:0,mesesAntecipacao:0,reducao:0.7}
+          },
+          embarcacao:{
+            alphaPlus:{nome:'Alpha Plus — referência de Pesados (confirmar tabela náutica)',prazos:[100,80,70,60,50,36],adm:[17,15,14,13,12,11],antecipacao:4,mesesAntecipacao:1,nota:'Condição ilustrativa baseada na tabela Pesados; confirmar existência e taxas específicas para embarcações.'},
+            betha:{nome:'Betha — referência de Pesados (confirmar tabela náutica)',prazos:[100,80,70,60,50,36,24],adm:[19,17,16,15,14,13,12],antecipacao:1,mesesAntecipacao:1,nota:'Condição ilustrativa baseada na tabela Pesados; confirmar existência e taxas específicas para embarcações.'},
+            gamma:{nome:'Gamma — referência de Pesados (confirmar tabela náutica)',prazos:[100,80,70,60,50,36,24],adm:[20,18,17,16,15,14,13],antecipacao:0,mesesAntecipacao:0,nota:'Condição ilustrativa baseada na tabela Pesados; confirmar existência e taxas específicas para embarcações.'},
+            powerSigma:{nome:'Power — Sigma Náutico (referência 2024)',prazos:[120,100,80,60],adm:[15,15,14,14],antecipacao:1,mesesAntecipacao:1,power:true,nota:'Tabela B2-15-TSA-100 (p. 100), IPCA, referência 2024; confirmar vigência e grupo.'},
+            powerOmega:{nome:'Power — Ômega Náutico (referência 2024)',prazos:[100,80,60],adm:[16,15,15],antecipacao:0,mesesAntecipacao:0,power:true,nota:'Tabela B2-15-TOA-101 (p. 101), IPCA, referência 2024; confirmar vigência e grupo.'}
           },
           luxo:{
             powerSigma:{nome:'Power — Sigma (referência 2024)',prazos:[120,100,80,60],adm:[15,15,14,14],antecipacao:1,mesesAntecipacao:1,power:true,nota:'Tabela AU-01-TSA-100, referência 2024. Confirmar vigência, grupo e condições.'},
