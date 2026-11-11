@@ -275,6 +275,7 @@
                                 <option value="rural">Crédito rural / agrário</option>
                                 <option value="pronampe">Pronampe — micro e pequenas empresas</option>
                             </select>
+                            <div id="seletorCreditoRural" style="display:none"><label class="block text-xs text-slate-300">Linha de crédito rural (Plano Safra 2026/2027)</label><select id="linhaCreditoRural" onchange="atualizarEmprestimoEmpresarial()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"><option value="pronamp">Pronamp — custeio (9,00% a.a.)</option><option value="custeio">Custeio empresarial (12,50% a.a.)</option><option value="inovagro">Inovagro (11,50% a.a.)</option><option value="moderfrota">Moderfrota (12,50% a.a.)</option><option value="cooperativa">Prodecoop / Procap-Agro (12,00% a.a.)</option><option value="renovagro">RenovAgro Ambiental / Pastagens (8,50% a.a.)</option></select></div>
                             <p id="notaEmprestimo" class="text-xs text-amber-200" role="status"></p>
                             <p class="text-xs text-slate-400">Taxa anual efetiva editável abaixo. IOF, tarifas, indexadores, carência e CET devem ser conferidos na proposta; os cálculos atuais não incorporam esses custos.</p>
                         </div>
@@ -555,12 +556,13 @@
             const modo=document.getElementById('modalidadeEmprestimo').value;
             const campo=document.getElementById('jurosBanco');
             const nota=document.getElementById('notaEmprestimo');
+            document.getElementById('seletorCreditoRural').style.display=modo==='rural'?'block':'none';
             document.getElementById('ajustarTaxaCenario').checked=false;
             const dados={
                 home:{taxa:18.16,nota:'Hipótese ilustrativa de 1,40% a.m. (18,16% a.a. efetivos), NÃO é taxa oficial ou cotação de Home Equity. Confirme CET, indexador e garantia.'},
                 veiculo:{taxa:23.87,nota:'Hipótese ilustrativa de 1,80% a.m. (23,87% a.a. efetivos), NÃO é taxa oficial ou cotação de refinanciamento de veículo. Confirme CET e garantia.'},
-                rural:{taxa:0,nota:'Crédito rural: taxas variam por programa, safra e enquadramento. Informe a taxa efetiva anual da proposta antes de comparar; 0% é campo pendente, não oferta.'},
-                pronampe:{taxa:0,nota:'Pronampe: teto legal Selic + até 6 pontos percentuais ao ano, sujeito às regras vigentes. Informe a taxa efetiva anual da operação; 0% é campo pendente, não oferta. Prazo legal máximo: 72 meses.'}
+                rural:{taxa:({pronamp:9,custeio:12.5,inovagro:11.5,moderfrota:12.5,cooperativa:12,renovagro:8.5})[document.getElementById('linhaCreditoRural').value],nota:'Taxa de referência Plano Safra 2026/2027. Depende de finalidade, elegibilidade e disponibilidade. Confirme condições, CET e encargos com a instituição.'},
+                pronampe:{taxa:19.75,nota:'Pronampe: simulação pelo TETO Selic meta de 13,75% + 6 p.p. = 19,75% a.a. (Selic conferida em 11/11/2026). Taxa variável; não é taxa fixa garantida ou CET. Atualize a referência após decisões do Copom. Prazo máximo: 72 meses.'}
             };
             campo.value=dados[modo].taxa.toFixed(2);
             nota.textContent=dados[modo].nota;
