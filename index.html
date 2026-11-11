@@ -247,7 +247,7 @@
                      <!-- Financiamento Bancário Section -->
                     <div class="pt-2 border-t border-slate-700 space-y-3">
                         <h3 class="text-xs font-semibold text-red-400 uppercase">Parâmetros de Financiamento Bancário</h3>
-                        <div>
+                        <div id="blocoEntradaBanco">
                             <label class="block text-xs font-medium text-slate-300 mb-1">Valor de Entrada Obrigatória no Banco (% do Bem)</label>
                             <input type="number" id="entradaPct" value="20" min="0" max="80" step="5" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
                             <p class="text-[10px] text-slate-400 mt-0.5" id="valEntradaText">Valor de Entrada: R$ 0,00 (Exigido pelo banco para aprovar)</p>
@@ -580,7 +580,7 @@
                 luxo:{pc:100,pf:72,credito:'200.000,00',adm:15,reserva:2.5,juros:15.5,entrada:30,mes:12},
                 embarcacao:{pc:100,pf:84,credito:'250.000,00',adm:18,reserva:2.5,juros:15,entrada:20,mes:12},
                 servicos:{pc:48,pf:48,credito:'30.000,00',adm:18,reserva:2,juros:17,entrada:20,mes:6},
-                capital_giro:{pc:60,pf:48,credito:'100.000,00',adm:18,reserva:2,juros:22,entrada:10,mes:6},
+                capital_giro:{pc:60,pf:48,credito:'100.000,00',adm:18,reserva:2,juros:22,entrada:0,mes:6},
                 investimento:{pc:180,pf:180,credito:'500.000,00',adm:18,reserva:2,juros:11.5,entrada:20,mes:6}
             };
             // Atualizar o menu imediatamente, antes de qualquer cálculo ou chamada externa.
@@ -594,6 +594,7 @@
             document.getElementById('seguroMensalPct').value=0;
             document.getElementById('jurosBanco').value=p.juros;
             document.getElementById('entradaPct').value=prod==='capital_giro'?0:p.entrada;
+            document.getElementById('blocoEntradaBanco').style.display=prod==='capital_giro'?'none':'block';
             atualizarBancoPorProduto(prod);
             atualizarTaxaCenario();
             document.getElementById('painelIndices').style.display=prod==='investimento'?'block':'none';
