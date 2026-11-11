@@ -141,6 +141,7 @@
                             <option value="auto">Automóvel Leve</option>
                             <option value="moto">Moto</option>
                             <option value="pesados">Pesados (Caminhões, Tratores, Silos)</option>
+                            <option value="maquinario">Maquinário (Agrícola / Industrial)</option>
                             <option value="luxo">Veículos de Luxo (Plano Power)</option>
                             <option value="embarcacao">Embarcação (Lanchas / Barcos)</option>
                             <option value="servicos">Serviços e Eletrônicos</option>
@@ -538,6 +539,7 @@
                 auto:{pc:60,pf:60,credito:'70.000,00',adm:15,reserva:2,juros:15.5,entrada:30,mes:6},
                 moto:{pc:60,pf:48,credito:'25.000,00',adm:18,reserva:2,juros:18,entrada:20,mes:6},
                 pesados:{pc:120,pf:96,credito:'450.000,00',adm:18,reserva:2,juros:14,entrada:20,mes:18},
+                maquinario:{pc:100,pf:96,credito:'200.000,00',adm:15,reserva:2.5,juros:14,entrada:20,mes:12},
                 luxo:{pc:100,pf:72,credito:'200.000,00',adm:15,reserva:2.5,juros:15.5,entrada:30,mes:12},
                 embarcacao:{pc:100,pf:84,credito:'250.000,00',adm:18,reserva:2.5,juros:15,entrada:20,mes:12},
                 servicos:{pc:48,pf:48,credito:'30.000,00',adm:18,reserva:2,juros:17,entrada:20,mes:6},
@@ -551,14 +553,14 @@
             document.getElementById('prazoFin').value=p.pf;
             document.getElementById('credito').value=p.credito;
             document.getElementById('taxaAdmAnual').value=p.adm;
-            document.getElementById('fundoReservaPct').value=['imovel','auto','pesados','luxo','embarcacao'].includes(prod)?2.5:p.reserva;
+            document.getElementById('fundoReservaPct').value=['imovel','auto','pesados','maquinario','luxo','embarcacao'].includes(prod)?2.5:p.reserva;
             document.getElementById('seguroMensalPct').value=0;
             document.getElementById('jurosBanco').value=p.juros;
             document.getElementById('entradaPct').value=p.entrada;
             atualizarBancoPorProduto(prod);
             atualizarTaxaCenario();
             document.getElementById('painelIndices').style.display=prod==='investimento'?'block':'none';
-            document.getElementById('tabelaUnifisa').style.display=['imovel','auto','pesados','luxo','embarcacao'].includes(prod)?'block':'none';
+            document.getElementById('tabelaUnifisa').style.display=['imovel','auto','pesados','maquinario','luxo','embarcacao'].includes(prod)?'block':'none';
             document.getElementById('planoUnifisa').value='';
             atualizarTabelaUnifisa();
             document.getElementById('ativarReduzida').checked=false;
@@ -864,6 +866,10 @@
             gamma:{nome:'Gamma',prazos:[100,80,70,60,50,36,24],adm:[20,18,17,16,15,14,13],antecipacao:0,mesesAntecipacao:0,nota:'Condições comerciais sujeitas à confirmação do grupo.'},
             powerSigma:{nome:'Power — Sigma Náutico',prazos:[120,100,80,60],adm:[15,15,14,14],antecipacao:1,mesesAntecipacao:1,power:true,nota:'Tabela B2-15-TSA-100 (p. 100), IPCA; confirmar vigência e grupo.'},
             powerOmega:{nome:'Power — Ômega Náutico',prazos:[100,80,60],adm:[16,15,15],antecipacao:0,mesesAntecipacao:0,power:true,nota:'Tabela B2-15-TOA-101 (p. 101), IPCA; confirmar vigência e grupo.'}
+          },
+          maquinario:{
+            powerSigma:{nome:'Power — Sigma',prazos:[120,100,80,60],adm:[15,15,14,14],antecipacao:1,mesesAntecipacao:1,power:true,nota:'Plano Power para máquinas agrícolas e industriais; confirmar condições e disponibilidade do grupo.'},
+            powerOmega:{nome:'Power — Ômega',prazos:[100,80,60],adm:[16,15,15],antecipacao:0,mesesAntecipacao:0,power:true,nota:'Plano Power para máquinas agrícolas e industriais; confirmar condições e disponibilidade do grupo.'}
           },
           luxo:{
             powerSigma:{nome:'Power — Sigma',prazos:[120,100,80,60],adm:[15,15,14,14],antecipacao:1,mesesAntecipacao:1,power:true,nota:'Tabela AU-01-TSA-100. Confirmar vigência, grupo e condições.'},
