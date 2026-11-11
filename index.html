@@ -597,7 +597,7 @@
             atualizarBancoPorProduto(prod);
             atualizarTaxaCenario();
             document.getElementById('painelIndices').style.display=prod==='investimento'?'block':'none';
-            document.getElementById('tabelaUnifisa').style.display=['imovel','auto','moto','pesados','maquinario','luxo','embarcacao'].includes(prod)?'block':'none';
+            document.getElementById('tabelaUnifisa').style.display=['imovel','auto','moto','pesados','maquinario','luxo','embarcacao','capital_giro'].includes(prod)?'block':'none';
             document.getElementById('blocoCreditoEmpresarial').style.display=prod==='capital_giro'?'block':'none';
             document.getElementById('planoUnifisa').value='';
             atualizarTabelaUnifisa();
@@ -788,7 +788,8 @@
               : 'Parcela após contemplação — parcela mantida, prazo reduzido (hipótese):';
             const nomePlano=planoSelecionado?.nome||'Personalizada';
             document.getElementById('linhaResumoPlano').textContent='Tabela: '+nomePlano+' | Administração: '+taxaAdmPct+'% | Antecipação: '+(antecipacaoAtiva?planoSelecionado.antecipacao:0)+'% | Reserva: '+reservaPct+'%';
-            if(produto==='imovel'&&prazoCons===240&&planoSelecionado)document.getElementById('linhaResumoPlano').textContent+=' | 240 meses: grupo em formação (simulação com taxa de 200 meses; confirmar condições comerciais).';
+            if((produto==='imovel'||produto==='capital_giro')&&prazoCons===240&&planoSelecionado)document.getElementById('linhaResumoPlano').textContent+=' | 240 meses: confirmar condições e disponibilidade de grupo em formação.';
+            if(produto==='capital_giro'&&planoSelecionado)document.getElementById('linhaResumoPlano').textContent+=' | Referência de aquisição de ativo; uso para capital de giro depende de enquadramento, garantia e regras contratuais.';
             if(planoSelecionado?.power)document.getElementById('linhaResumoPlano').textContent+=' | Plano Power: confirme vigência e disponibilidade do grupo antes de apresentar proposta.';
 
             if(!prazoPlanoValido)document.getElementById('linhaResumoPlano').textContent='ATENÇÃO: crédito ou prazo fora das condições cadastradas do Plano Power/tabela comercial. Resultados não válidos para proposta.';
@@ -817,6 +818,7 @@
             if(ativarRed) aviso.push('Parcela reduzida calculada sobre fundo comum, administração e reserva, mantendo seguro integral; recálculo após contemplação é uma estimativa sem reajustes.');
             if(document.getElementById('planoUnifisa').value==='gamma12') aviso.push('Gamma 12: não foi localizada tabela própria no PDF oficial fornecido. Os valores não estão homologados.');
             if (credito<=0) aviso.push('Informe um valor de crédito maior que zero.');
+            if(produto==='capital_giro'&&planoSelecionado)aviso.push('As tabelas imobiliárias e Power são referências para aquisição de ativos elegíveis. A simulação não representa aprovação ou liberação automática de capital de giro; confirme finalidade, garantias e regulamento.');
             if(produto==='capital_giro'&&jurosAA===0)aviso.push('A taxa do empréstimo ainda não foi informada. Comparação não deve ser usada até inserir a taxa efetiva anual da proposta.');
             if (lancePretendido>saldoAntesLance+0.01) aviso.push('O lance informado supera o saldo estimado após as parcelas anteriores; o simulador limitou o abatimento ao saldo disponível.');
             if (lanceEmbutido>credito*0.30+0.01) aviso.push('Confirme o limite de lance embutido permitido no regulamento do grupo.');
@@ -942,6 +944,17 @@
             delta:{nome:'Delta (sem antecipação)',prazos:[240,200,180,160,140,120,100,80,60],adm:[25,26,24,23,22,20,19,18,15],antecipacao:0,mesesAntecipacao:0,nota:'Delta: 240 meses e 25%, condição de grupo em formação informada pelo consultor; 60 meses e 15% confirmados pelo consultor. Confirmar disponibilidade do grupo.'},
             delta50:{nome:'Delta 50% (tabela oficial)',prazos:[240,200,180,160,140],adm:[24,24,24,24,23],antecipacao:1,mesesAntecipacao:1,reducao:0.5,nota:'Tabela IM-05-DDK-106. Valores reduzidos sujeitos à regra de composição do seguro e parcelas.'}
           },
+          capital_giro:{
+            betha:{nome:'Imóveis — Betha (sujeito à garantia e finalidade)',prazos:[240,200,180,160,140,120,100,80,60],adm:[22,22,20,19,18,17,16,15,14],antecipacao:2,mesesAntecipacao:1,nota:'Referência da tabela imobiliária Betha. Uso para capital de giro depende de análise, garantia e regras da administradora.'},
+            alphaPlus:{nome:'Imóveis — Alpha Plus (sujeito à garantia e finalidade)',prazos:[240,200,180,160,140,120,100,80,60],adm:[20,20,18,18,17,16,15,14,13],antecipacao:4,mesesAntecipacao:1,nota:'Referência da tabela imobiliária Alpha Plus; confirmar enquadramento da operação empresarial.'},
+            gamma:{nome:'Imóveis — Gamma (sujeito à garantia e finalidade)',prazos:[240,200,180,160,140,120,100,80,60],adm:[24,24,22,21,20,18,17,16,15],antecipacao:1,mesesAntecipacao:1,nota:'Referência da tabela imobiliária Gamma; confirmar enquadramento da operação empresarial.'},
+            gamma12:{nome:'Imóveis — Gamma 12 (sujeito à garantia e finalidade)',prazos:[240,200,180,160,140,120,100,80,60],adm:[24,24,22,21,20,18,17,16,15],antecipacao:1,mesesAntecipacao:12,nota:'Referência Gamma 12; antecipação em 12 meses. Confirmar regras e elegibilidade.'},
+            delta:{nome:'Imóveis — Delta (sem antecipação)',prazos:[240,200,180,160,140,120,100,80,60],adm:[25,26,24,23,22,20,19,18,15],antecipacao:0,mesesAntecipacao:0,nota:'Referência Delta imobiliária; 240 meses/25% é grupo em formação informado pelo consultor.'},
+            omega50:{nome:'Imóveis — Ômega 50% (parcela reduzida)',prazos:[240,200,180,160,140],adm:[22,22,22,22,21],antecipacao:2,mesesAntecipacao:1,reducao:0.5,nota:'Referência imobiliária; aplicação em operação empresarial sujeita à confirmação.'},
+            delta50:{nome:'Imóveis — Delta 50% (parcela reduzida)',prazos:[240,200,180,160,140],adm:[24,24,24,24,23],antecipacao:1,mesesAntecipacao:1,reducao:0.5,nota:'Referência imobiliária; aplicação em operação empresarial sujeita à confirmação.'},
+            powerSigma:{nome:'Power — Sigma (ativos elegíveis)',prazos:[120,100,80,60],adm:[15,15,14,14],antecipacao:1,mesesAntecipacao:1,power:true,nota:'Referência Power para ativos elegíveis, não carta de capital de giro livre. Confirmar modalidade, finalidade e garantia.'},
+            powerOmega:{nome:'Power — Ômega (ativos elegíveis)',prazos:[100,80,60],adm:[16,15,15],antecipacao:0,mesesAntecipacao:0,power:true,nota:'Referência Power para ativos elegíveis, não carta de capital de giro livre. Confirmar modalidade, finalidade e garantia.'}
+          },
           auto:{
             alphaPlus:{nome:'Alpha Plus',prazos:[80,70,60,50,36],adm:[15,14,13,12,11],antecipacao:4,mesesAntecipacao:1},
             betha:{nome:'Betha',prazos:[80,70,60,50,36,24],adm:[17,16,15,14,13,12],antecipacao:1,mesesAntecipacao:1},
@@ -1026,7 +1039,7 @@
             calcular();
             return;
           }
-          const adm=plano.adm[i],reserva=2.5,seguro=produto==='imovel'?0.03:0.06;
+          const adm=plano.adm[i],reserva=2.5,seguro=(produto==='imovel'||(produto==='capital_giro'&&!plano.power))?0.03:0.06;
           document.getElementById('taxaAdmAnual').value=adm;
           document.getElementById('fundoReservaPct').value=reserva;
           document.getElementById('seguroMensalPct').value=seguro;
