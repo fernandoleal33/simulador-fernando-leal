@@ -322,6 +322,13 @@
                     </div>
                 </div>
 
+                <section id="graficoComparativoBox" class="bg-slate-800/60 border border-slate-700/60 p-5 rounded-2xl mt-4" aria-label="Comparação gráfica dos desembolsos">
+                    <h3 class="text-sm font-semibold text-white mb-2">Evolução do desembolso acumulado</h3>
+                    <div class="flex flex-wrap gap-4 text-xs mb-3"><span class="text-emerald-400">━━ Consórcio</span><span class="text-rose-400">━━ Financiamento</span></div>
+                    <svg id="graficoComparativo" viewBox="0 0 700 290" role="img" aria-label="Gráfico de linhas do desembolso acumulado por mês" style="display:block;width:100%;height:auto;max-height:350px"></svg>
+                    <p id="graficoComparativoResumo" class="text-xs text-slate-300 mt-2"></p>
+                    <p class="text-xs text-slate-400 mt-2">Valores nominais ilustrativos, sem reajustes futuros, CET ou despesas bancárias adicionais. Contemplação e lances são hipóteses; curvas não representam saldo devedor nem rentabilidade.</p>
+                </section>
                 <!-- Detailed Breakdown Box -->
                 <div class="bg-slate-800/60 border border-slate-700/60 p-5 rounded-2xl">
                     <h3 class="text-sm font-semibold text-white mb-3">Detalhamento Financeiro: Consórcio vs Financiamento</h3>
@@ -604,6 +611,51 @@
             }
             return { primeira, ultima, juros:Math.max(0,total-principal), total };
         }
+        function desenharGraficoComparativo(cons,fin,prazoCons,prazoFin,entrada,mesCont,parcelaAntes,adicionalInicial,mesesAntecipados,parcelaDepois,lanceProprio,sistema,principal,jurosAnual) {
+            const svg=document.getElementById('graficoComparativo');
+            if(!svg)return;
+            const NS='http://www.w3.org/2000/svg',W=700,H=290,L=76,R=18,T=15,B=43;
+            const maxMes=Math.max(prazoCons,prazoFin,1),a=Math.pow(1+jurosAnual/100,1/12)-1;
+            const serieCons=[0],serieFin=[entrada];
+            let saldo=principal,acumuladoCons=0,acumuladoFin=entrada;
+            for(let m=1;m<=maxMes;m++){
+                if(m<=prazoCons){
+                    const parcela=m<=mesCont?parcelaAntes+(m<=mesesAntecipados?adicionalInicial:0):parcelaDepois;
+                    acumuladoCons+=Math.max(0,parcela);
+                    if(m===mesCont)acumuladoCons+=Math.max(0,lanceProprio);
+                    acumuladoCons=Math.min(cons,acumuladoCons);
+                }
+                if(m<=prazoFin&&principal>0){
+                    let parcela=0;
+                    if(sistema==='sac'){
+                        const amort=saldo/(prazoFin-m+1);
+                        parcela=amort+saldo*a;
+                        saldo=Math.max(0,saldo-amort);
+                    }else{
+                        parcela=a===0?principal/prazoFin:principal*a/(1-Math.pow(1+a,-prazoFin));
+                    }
+                    acumuladoFin+=parcela;
+                }
+                serieCons.push(m===maxMes?cons:acumuladoCons);
+                serieFin.push(m===maxMes?fin:acumuladoFin);
+            }
+            const teto=Math.max(cons,fin,...serieCons,...serieFin,1)*1.08;
+            const x=m=>L+m/maxMes*(W-L-R),y=v=>H-B-v/teto*(H-T-B);
+            const el=(tag,attrs,txt)=>{const n=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,v);if(txt!==undefined)n.textContent=txt;svg.appendChild(n);return n;};
+            svg.replaceChildren();
+            for(let t=0;t<=4;t++){
+                const val=t*teto/4,yy=y(val);
+                el('line',{x1:L,y1:yy,x2:W-R,y2:yy,stroke:'#475569','stroke-opacity':'.55','stroke-dasharray':'3 5'});
+                el('text',{x:L-8,y:yy+4,'text-anchor':'end',fill:'#cbd5e1','font-size':'11'},'R$ '+Math.round(val/1000).toLocaleString('pt-BR')+' mil');
+            }
+            for(let t=0;t<=4;t++){const m=Math.round(t*maxMes/4);el('text',{x:x(m),y:H-15,'text-anchor':'middle',fill:'#cbd5e1','font-size':'12'},String(m));}
+            el('text',{x:(L+W-R)/2,y:H-1,'text-anchor':'middle',fill:'#cbd5e1','font-size':'11'},'Meses');
+            for(const [valores,cor] of [[serieCons,'#34d399'],[serieFin,'#fb7185']]){
+                const pts=valores.map((v,i)=>x(i).toFixed(2)+','+y(v).toFixed(2)).join(' ');
+                el('polyline',{points:pts,fill:'none',stroke:cor,'stroke-width':'3','stroke-linecap':'round','stroke-linejoin':'round'});
+            }
+            document.getElementById('graficoComparativoResumo').textContent='Ao final: consórcio '+fmt(cons)+' | financiamento '+fmt(fin)+'. Compare também o prazo e o crédito líquido de cada opção.';
+        }
         function calcular() {
             if(document.getElementById('produto').value==='investimento'){calcularIndice();return;}
             atualizarTaxaCenario();
@@ -714,6 +766,8 @@
             document.getElementById('valLanceEmbutidoResumo').textContent=fmt(embutidoAplicado);
             document.getElementById('valCreditoLiquido').textContent=fmt(creditoLiquido);
             document.getElementById('valCustoConsorcio').textContent=fmt(desembolsoCons);
+            if(prazoPlanoValido&&credito>0)desenharGraficoComparativo(desembolsoCons,custoFin,prazoCons,prazoFin,valorEntrada,mesCont,parcelaReduzida,adicionalInicial,mesesTaxaAntecipada,parcelaPos,lanceProprioAplicado,sistema,principalFin,jurosAA);
+            else {document.getElementById('graficoComparativo').replaceChildren();document.getElementById('graficoComparativoResumo').textContent='Ajuste o crédito ou prazo para exibir a comparação.';}
             document.getElementById('labelParcPre').textContent=mesesTaxaAntecipada?`Parcela inicial com antecipação de ${planoSelecionado.antecipacao}%${mesesTaxaAntecipada>1?' (diluída em '+mesesTaxaAntecipada+' meses)':''}:`:(ativarRed?`Parcela reduzida até o mês ${mesCont}:`:'Parcela estimada antes da contemplação:');
             document.getElementById('divSubTituloFin').textContent=`Financiamento (${sistema.toUpperCase()})`;
             document.getElementById('cardTitle1').textContent='Diferença estimada de desembolso';
