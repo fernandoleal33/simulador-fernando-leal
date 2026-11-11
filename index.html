@@ -553,14 +553,14 @@
             document.getElementById('prazoFin').value=p.pf;
             document.getElementById('credito').value=p.credito;
             document.getElementById('taxaAdmAnual').value=p.adm;
-            document.getElementById('fundoReservaPct').value=['imovel','auto','pesados','maquinario','luxo','embarcacao'].includes(prod)?2.5:p.reserva;
+            document.getElementById('fundoReservaPct').value=['imovel','auto','moto','pesados','maquinario','luxo','embarcacao'].includes(prod)?2.5:p.reserva;
             document.getElementById('seguroMensalPct').value=0;
             document.getElementById('jurosBanco').value=p.juros;
             document.getElementById('entradaPct').value=p.entrada;
             atualizarBancoPorProduto(prod);
             atualizarTaxaCenario();
             document.getElementById('painelIndices').style.display=prod==='investimento'?'block':'none';
-            document.getElementById('tabelaUnifisa').style.display=['imovel','auto','pesados','maquinario','luxo','embarcacao'].includes(prod)?'block':'none';
+            document.getElementById('tabelaUnifisa').style.display=['imovel','auto','moto','pesados','maquinario','luxo','embarcacao'].includes(prod)?'block':'none';
             document.getElementById('planoUnifisa').value='';
             atualizarTabelaUnifisa();
             document.getElementById('ativarReduzida').checked=false;
@@ -849,10 +849,10 @@
             betha:{nome:'Betha',prazos:[240,200,180,160,140,120,100,80,60],adm:[22,22,20,19,18,17,16,15,14],antecipacao:2,mesesAntecipacao:1,nota:'Conforme tabela comercial Betha Imóvel (IM - 02 - VBK - 05); validar vigência e condições do grupo.'},
             alphaPlus:{nome:'Alpha Plus',prazos:[240,200,180,160,140,120,100,80,60],adm:[20,20,18,18,17,16,15,14,13],antecipacao:4,mesesAntecipacao:1},
             gamma:{nome:'Gamma',prazos:[240,200,180,160,140,120,100,80,60],adm:[24,24,22,21,20,18,17,16,15],antecipacao:1,mesesAntecipacao:1},
-            gamma12:{nome:'Gamma 12',prazos:[240,200,180,160,140,120,100,80,60],adm:[24,24,22,21,20,18,17,16,15],antecipacao:1,mesesAntecipacao:12,nota:'Gamma 12 não localizada na tabela oficial fornecida; taxas Gamma são apenas hipótese, NÃO homologada.'},
+            gamma12:{nome:'Gamma 12',prazos:[240,200,180,160,140,120,100,80,60],adm:[24,24,22,21,20,18,17,16,15],antecipacao:1,mesesAntecipacao:12,nota:'Gamma 12 utiliza as mesmas taxas administrativas da Gamma, conforme confirmação comercial; antecipação distribuída em 12 meses.'},
             red50:{nome:'Reduzida 50% — condição personalizada (não homologada)',prazos:[240,200,180,160,140],adm:[25,25,25,25,25],antecipacao:0,mesesAntecipacao:0,reducao:0.5,nota:'Condição comercial informada, não identificada nas tabelas oficiais deste PDF.'},
             omega50:{nome:'Ômega 50% (tabela oficial)',prazos:[240,200,180,160,140],adm:[22,22,22,22,21],antecipacao:2,mesesAntecipacao:1,reducao:0.5,nota:'Tabela IM - 05 - DOK - 107. Valores reduzidos sujeitos à regra de composição do seguro e parcelas.'},
-            delta:{nome:'Delta (sem antecipação)',prazos:[200,180,160,140,120,100,80],adm:[26,24,23,22,20,19,18],antecipacao:0,mesesAntecipacao:0,nota:'Tabela IM-04-VDK-05; confirmar a taxa para 60 meses na tabela comercial antes de proposta.'},
+            delta:{nome:'Delta (sem antecipação)',prazos:[200,180,160,140,120,100,80,60],adm:[26,24,23,22,20,19,18,15],antecipacao:0,mesesAntecipacao:0,nota:'Tabela IM-04-VDK-05; taxa de 60 meses confirmada pelo consultor.'},
             delta50:{nome:'Delta 50% (tabela oficial)',prazos:[240,200,180,160,140],adm:[24,24,24,24,23],antecipacao:1,mesesAntecipacao:1,reducao:0.5,nota:'Tabela IM-05-DDK-106. Valores reduzidos sujeitos à regra de composição do seguro e parcelas.'}
           },
           auto:{
@@ -861,14 +861,20 @@
             gamma:{nome:'Gamma',prazos:[80,70,60,50,36,24],adm:[18,17,16,15,14,13],antecipacao:0,mesesAntecipacao:0},
             gamma30:{nome:'Gamma 30% — parcela reduzida (70% da base)',prazos:[100,80,60],adm:[20,18,16],antecipacao:0,mesesAntecipacao:0,reducao:0.7}
           },
+          moto:{
+            alphaPlus:{nome:'Alpha Plus',prazos:[36,24],adm:[14,13],antecipacao:4,mesesAntecipacao:1,nota:'Tabela Motos Alpha Plus (p. 49).'},
+            betha:{nome:'Betha',prazos:[36,24],adm:[16,15],antecipacao:1,mesesAntecipacao:1,nota:'Tabela Motos Betha (p. 51).'},
+            gamma:{nome:'Gamma',prazos:[36,24],adm:[17,16],antecipacao:0,mesesAntecipacao:0,nota:'Tabela Motos Gamma (p. 52).'}
+          },
           embarcacao:{
-            alphaPlus:{nome:'Alpha Plus',prazos:[100,80,70,60,50,36],adm:[17,15,14,13,12,11],antecipacao:4,mesesAntecipacao:1,nota:'Condições comerciais sujeitas à confirmação do grupo.'},
-            betha:{nome:'Betha',prazos:[100,80,70,60,50,36,24],adm:[19,17,16,15,14,13,12],antecipacao:1,mesesAntecipacao:1,nota:'Condições comerciais sujeitas à confirmação do grupo.'},
-            gamma:{nome:'Gamma',prazos:[100,80,70,60,50,36,24],adm:[20,18,17,16,15,14,13],antecipacao:0,mesesAntecipacao:0,nota:'Condições comerciais sujeitas à confirmação do grupo.'},
+            betha:{nome:'Betha',prazos:[100,80,60,50,36],adm:[20,18,16,15,14],antecipacao:1,mesesAntecipacao:1,nota:'Tabela Embarcações Betha (p. 55); taxas por prazo.'},
+            gamma:{nome:'Gamma',prazos:[100,80,70,60,50,36],adm:[20,18,17,16,15,14],antecipacao:0,mesesAntecipacao:0,nota:'Tabela Embarcações Gamma (p. 56); taxas por prazo.'},
             powerSigma:{nome:'Power — Sigma Náutico',prazos:[120,100,80,60],adm:[15,15,14,14],antecipacao:1,mesesAntecipacao:1,power:true,nota:'Tabela B2-15-TSA-100 (p. 100), IPCA; confirmar vigência e grupo.'},
             powerOmega:{nome:'Power — Ômega Náutico',prazos:[100,80,60],adm:[16,15,15],antecipacao:0,mesesAntecipacao:0,power:true,nota:'Tabela B2-15-TOA-101 (p. 101), IPCA; confirmar vigência e grupo.'}
           },
           maquinario:{
+            betha:{nome:'Betha',prazos:[100,80,60,50,36],adm:[20,18,16,15,14],antecipacao:1,mesesAntecipacao:1,nota:'Tabela Maquinários Betha (p. 65); taxas por prazo.'},
+            gamma:{nome:'Gamma',prazos:[100,80,60,50,36],adm:[20,18,16,15,14],antecipacao:0,mesesAntecipacao:0,nota:'Tabela Maquinários Gamma (p. 66); taxas por prazo.'},
             powerSigma:{nome:'Power — Sigma',prazos:[120,100,80,60],adm:[15,15,14,14],antecipacao:1,mesesAntecipacao:1,power:true,nota:'Plano Power para máquinas agrícolas e industriais; confirmar condições e disponibilidade do grupo.'},
             powerOmega:{nome:'Power — Ômega',prazos:[100,80,60],adm:[16,15,15],antecipacao:0,mesesAntecipacao:0,power:true,nota:'Plano Power para máquinas agrícolas e industriais; confirmar condições e disponibilidade do grupo.'}
           },
