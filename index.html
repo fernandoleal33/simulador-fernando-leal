@@ -42,6 +42,11 @@
   .fl-lead { color:#b8c9dc; line-height:1.7; margin:0 0 28px; max-width:760px; }
   .fl-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:15px; }
   .fl-tile { border:1px solid #294564; background:#0c2543; padding:21px; border-radius:15px; }
+  .fl-tile-action { display:block; width:100%; text-align:left; cursor:pointer; font:inherit; transition:transform .2s,border-color .2s,background .2s; }
+  .fl-tile-action:hover { transform:translateY(-3px); border-color:#34d399; background:#103253; }
+  .fl-tile-action:focus-visible { outline:3px solid #34d399; outline-offset:3px; }
+  .fl-tile .fl-tile-icon { display:block; font-size:29px; margin-bottom:12px; line-height:1.2; }
+  .fl-tile .fl-tile-cta { display:block; color:#6ee7b7; font-size:12px; font-weight:700; margin-top:17px; }
   .fl-tile b { display:block; color:#fff; margin-bottom:7px; }
   .fl-tile span { color:#b9cbe0; font-size:13px; line-height:1.55; }
   .fl-simulator-intro { max-width:1180px; margin:0 auto; padding:35px 22px 8px; }
@@ -93,12 +98,12 @@
     <h2>Uma estratégia para cada projeto</h2>
     <p class="fl-lead">Conheça algumas possibilidades e converse comigo para avaliar regras, custos, prazos e condições adequadas ao seu planejamento.</p>
     <div class="fl-grid">
-      <div class="fl-tile"><b>Imóveis</b><span>Imóveis prontos ou na planta, terrenos, construção e reforma.</span></div>
-      <div class="fl-tile"><b>Veículos e mobilidade</b><span>Carros, motos, caminhões, ônibus e renovação de frota.</span></div>
-      <div class="fl-tile"><b>Náutico e equipamentos</b><span>Embarcações, máquinas, equipamentos e outros ativos elegíveis.</span></div>
-      <div class="fl-tile"><b>Agro e empresarial</b><span>Planejamento para aquisição de ativos e expansão de operações.</span></div>
-      <div class="fl-tile"><b>Capital e patrimônio</b><span>Estudo de alternativas de crédito conforme as regras do produto.</span></div>
-      <div class="fl-tile"><b>Comparativo financeiro</b><span>Visualize cenários de consórcio e financiamento com premissas editáveis.</span></div>
+      <button type="button" class="fl-tile fl-tile-action" data-produto="imovel" onclick="abrirSolucao('imovel')" aria-label="Simular imóvel"><span class="fl-tile-icon" aria-hidden="true">🏠</span><b>Imóveis</b><span>Imóveis prontos ou na planta, terrenos, construção e reforma.</span><span class="fl-tile-cta">Simular imóvel →</span></button>
+      <button type="button" class="fl-tile fl-tile-action" data-produto="auto" onclick="abrirSolucao('auto')" aria-label="Simular veículo"><span class="fl-tile-icon" aria-hidden="true">🚘</span><b>Veículos e mobilidade</b><span>Carros, motos, caminhões, ônibus e renovação de frota.</span><span class="fl-tile-cta">Simular veículo →</span></button>
+      <button type="button" class="fl-tile fl-tile-action" data-produto="embarcacao" onclick="abrirSolucao('embarcacao')" aria-label="Simular embarcação"><span class="fl-tile-icon" aria-hidden="true">⛵</span><b>Náutico e equipamentos</b><span>Embarcações, máquinas, equipamentos e outros ativos elegíveis.</span><span class="fl-tile-cta">Simular embarcação →</span></button>
+      <button type="button" class="fl-tile fl-tile-action" data-produto="maquinario" onclick="abrirSolucao('maquinario')" aria-label="Simular agro"><span class="fl-tile-icon" aria-hidden="true">🌾</span><b>Agro e empresarial</b><span>Planejamento para aquisição de ativos e expansão de operações.</span><span class="fl-tile-cta">Simular agro →</span></button>
+      <button type="button" class="fl-tile fl-tile-action" data-produto="capital_giro" onclick="abrirSolucao('capital_giro')" aria-label="Comparar crédito empresarial"><span class="fl-tile-icon" aria-hidden="true">🏢</span><b>Capital e patrimônio</b><span>Estudo de alternativas de crédito conforme as regras do produto.</span><span class="fl-tile-cta">Comparar crédito empresarial →</span></button>
+      <button type="button" class="fl-tile fl-tile-action" data-produto="imovel" onclick="abrirSolucao('imovel')" aria-label="Abrir comparativo"><span class="fl-tile-icon" aria-hidden="true">📊</span><b>Comparativo financeiro</b><span>Visualize cenários de consórcio e financiamento com premissas editáveis.</span><span class="fl-tile-cta">Abrir comparativo →</span></button>
     </div>
   </section>
   <div class="fl-simulator-intro" id="simulador">
@@ -568,6 +573,13 @@
             nota.textContent=dados[modo].nota;
             if(modo==='pronampe'&&Number(document.getElementById('prazoFin').value)>72)document.getElementById('prazoFin').value=72;
             calcular();
+        }
+        function abrirSolucao(produto) {
+            const seletor=document.getElementById('produto');
+            if(!seletor || !Array.from(seletor.options).some(op=>op.value===produto))return;
+            seletor.value=produto;
+            mudarProduto();
+            document.getElementById('simulador').scrollIntoView({behavior:'smooth',block:'start'});
         }
         function mudarProduto() {
             const prod = document.getElementById('produto').value;
