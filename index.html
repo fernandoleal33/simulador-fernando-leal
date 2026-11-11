@@ -636,8 +636,8 @@
                     }
                     acumuladoFin+=parcela;
                 }
-                serieCons.push(m===maxMes?cons:acumuladoCons);
-                serieFin.push(m===maxMes?fin:acumuladoFin);
+                serieCons.push(m>=prazoCons?cons:acumuladoCons);
+                serieFin.push(m>=prazoFin?fin:acumuladoFin);
             }
             const teto=Math.max(cons,fin,...serieCons,...serieFin,1)*1.08;
             const x=m=>L+m/maxMes*(W-L-R),y=v=>H-B-v/teto*(H-T-B);
