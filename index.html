@@ -81,6 +81,15 @@
   .fl-more-links button { border:1px solid #42647b; background:#153753; color:#e7f4ff; border-radius:25px; padding:9px 15px; cursor:pointer; font-size:12px; }
   .fl-opportunity-note { color:#aebed0; font-size:11px; line-height:1.6; margin:18px 0 0; }
   @media(max-width:920px){.fl-opportunities-grid{grid-template-columns:1fr}.fl-opportunity-art{height:220px}.fl-opportunity-body{padding:22px}}
+  .fl-mobile-actions { display:none; }
+  @media(max-width:767px) {
+    .fl-mobile-actions { position:fixed; bottom:0; left:0; right:0; z-index:45; display:flex; gap:10px; padding:10px 12px calc(10px + env(safe-area-inset-bottom)); background:#091e33f2; border-top:1px solid #365a74; }
+    .fl-mobile-actions button { flex:1; border-radius:10px; padding:13px 8px; font-size:13px; font-weight:800; }
+    .fl-mobile-actions .fl-mobile-sim { background:#34d399; color:#082b30; }
+    .fl-mobile-actions .fl-mobile-chat { background:#163e50; color:#e3fff5; border:1px solid #3e8978; }
+    body { padding-bottom:calc(76px + env(safe-area-inset-bottom)); }
+    input,select,textarea { font-size:16px !important; }
+  }
   .fl-simulator-intro { max-width:1180px; margin:0 auto; padding:35px 22px 8px; }
   .fl-simulator-intro h2 { color:#fff; font-size:clamp(26px,3vw,38px); margin:0 0 10px; }
   .fl-simulator-intro p { color:#b8c9dc; line-height:1.6; margin:0; }
@@ -254,7 +263,7 @@
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Lance Livre (Recurso Próprio em R$)</label>
                             <input type="text" id="lanceLivre" value="0,00" oninput="mascaraMoeda(this)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                            <p class="text-[10px] text-slate-400 mt-0.5">Dinheiro do bolso usado para antecipar e amortizar saldo devedor.</p>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Dinheiro do bolso usado para antecipar e amortizar saldo devedor.</p><div class="flex flex-wrap gap-2 mt-2"><button type="button" onclick="preencherLanceEstrategico('fluxo')" class="bg-emerald-900/50 border border-emerald-600 rounded px-2 py-2 text-xs text-emerald-100">Fluxo de obras</button><button type="button" onclick="preencherLanceEstrategico('troca')" class="bg-emerald-900/50 border border-emerald-600 rounded px-2 py-2 text-xs text-emerald-100">Troca de chaves</button><button type="button" onclick="preencherLanceEstrategico('limpar')" class="bg-slate-700 rounded px-2 py-2 text-xs text-white">Zerar lance</button></div><p id="notaLanceEstrategico" class="text-[10px] text-slate-400 mt-1">Lances são hipóteses e dependem das regras e aprovação do grupo.</p>
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-slate-300 mb-1">Lance Embutido (% sobre o crédito)</label>
@@ -302,7 +311,7 @@
                                 <option value="pronampe">Pronampe — micro e pequenas empresas</option>
                             </select>
                             <div id="seletorCreditoRural" style="display:none"><label class="block text-xs text-slate-300">Linha de crédito rural (Plano Safra 2026/2027)</label><select id="linhaCreditoRural" onchange="atualizarEmprestimoEmpresarial()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white"><option value="pronamp">Pronamp — custeio (9,00% a.a.)</option><option value="custeio">Custeio empresarial (12,50% a.a.)</option><option value="inovagro">Inovagro (11,50% a.a.)</option><option value="moderfrota">Moderfrota (12,50% a.a.)</option><option value="cooperativa">Prodecoop / Procap-Agro (12,00% a.a.)</option><option value="renovagro">RenovAgro Ambiental / Pastagens (8,50% a.a.)</option></select></div>
-                            <p id="notaEmprestimo" class="text-xs text-amber-200" role="status"></p>
+                            <p id="notaEmprestimo" class="text-xs text-amber-200" role="status"></p><p id="statusSelicPronampe" class="text-xs text-slate-300">Pronampe: referência cadastrada; consulte a Selic atual antes de apresentar.</p><button type="button" onclick="consultarSelicPronampe()" class="bg-slate-700 border border-slate-500 rounded px-3 py-2 text-xs text-white">Atualizar Selic oficial (BCB)</button>
                             <p class="text-xs text-slate-400">Taxa anual efetiva editável abaixo. IOF, tarifas, indexadores, carência e CET devem ser conferidos na proposta; os cálculos atuais não incorporam esses custos.</p>
                         </div>
                         <div id="blocoBancoAuto" style="display:none;">
@@ -360,6 +369,7 @@
                     </div>
                 </div>
 
+                <section id="resumoExecutivo" class="bg-slate-800/60 border border-emerald-800/50 p-5 rounded-2xl mt-4" aria-label="Resumo executivo da simulação"><h3 class="text-sm font-semibold text-emerald-300 mb-2">Resumo executivo da comparação</h3><p id="textoResumoExecutivo" class="text-sm text-slate-200 leading-relaxed">Preencha os parâmetros para comparar os cenários.</p><p class="text-xs text-slate-400 mt-2">Diferença nominal de desembolsos; não é rentabilidade, CET ou promessa de contemplação.</p></section>
                 <section id="graficoComparativoBox" class="bg-slate-800/60 border border-slate-700/60 p-5 rounded-2xl mt-4" aria-label="Comparação gráfica dos desembolsos">
                     <h3 class="text-sm font-semibold text-white mb-2">Evolução do desembolso acumulado</h3>
                     <div class="flex flex-wrap gap-4 text-xs mb-3"><span class="text-emerald-400">━━ Consórcio</span><span class="text-rose-400">━━ Financiamento</span></div>
@@ -590,7 +600,7 @@
                 rural:{taxa:12.5,nota:'Crédito rural: referência de 12,50% ao ano para o cenário empresarial solicitado. Confirme finalidade, enquadramento, disponibilidade e CET na proposta.'},
                 pronampe:{taxa:19.75,nota:'Pronampe: simulação pelo TETO Selic meta de 13,75% + 6 p.p. = 19,75% a.a. (Selic conferida em 11/11/2026). Taxa variável; não é taxa fixa garantida ou CET. Atualize a referência após decisões do Copom. Prazo máximo: 72 meses.'}
             };
-            campo.value=dados[modo].taxa.toFixed(2);
+            campo.value=(modo==='pronampe'&&window.__selicPronampe?window.__selicPronampe.taxa+6:dados[modo].taxa).toFixed(2);
             nota.textContent=dados[modo].nota;
             if(modo==='pronampe'&&Number(document.getElementById('prazoFin').value)>72)document.getElementById('prazoFin').value=72;
             calcular();
@@ -603,6 +613,28 @@
             painel.hidden=!abrir;
             botao.setAttribute('aria-expanded',String(abrir));
             botao.textContent=abrir?'Recolher estratégias −':'Explorar estratégias +';
+        }
+        function preencherLanceEstrategico(tipo) {
+            const produto=document.getElementById('produto').value;
+            const nota=document.getElementById('notaLanceEstrategico');
+            if(tipo==='limpar'){
+                document.getElementById('lanceLivre').value='0,00';
+                document.getElementById('lanceEmbutidoPct').value='0';
+                nota.textContent='Lance zerado. Simulação sem oferta de lance.';
+                calcular();return;
+            }
+            if(tipo==='fluxo'&&produto!=='imovel'){abrirSolucao('imovel');}
+            if(tipo==='troca'&&produto!=='auto'){abrirSolucao('auto');}
+            const mensagem=tipo==='fluxo'?'Informe o valor já pago no fluxo de obras que poderia estar disponível para uma estratégia de lance (R$).':'Informe o valor líquido estimado que ficará disponível após negociar ou vender seu veículo atual (R$).';
+            const valor=window.prompt(mensagem,'0');
+            if(valor===null)return;
+            const montante=parseMoeda(valor);
+            if(!Number.isFinite(montante)||montante<0){nota.textContent='Informe um valor válido e não negativo.';return;}
+            const credito=parseMoeda(document.getElementById('credito').value);
+            if(montante>credito){nota.textContent='O lance próprio não pode exceder o crédito de referência nesta simulação.';return;}
+            document.getElementById('lanceLivre').value=montante.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+            nota.textContent=tipo==='fluxo'?'Cenário ilustrativo de fluxo de obras. Verifique se o recurso estará efetivamente disponível, a negociação com a incorporadora e as regras de lance.':'Cenário ilustrativo de troca de chaves. O valor do veículo não equivale a lance automático: depende da venda ou negociação e das regras do grupo.';
+            calcular();
         }
         function conversarSobreEstrategia(estrategia) {
             const mensagens={
@@ -892,13 +924,15 @@
             // Mantém a área antiga de investimento oculta: projeções de valorização/aluguel não são retorno garantido.
             document.getElementById('blocoExplicacaoInvestimento').style.display='none';
             const bancoSelecionado = produto === 'imovel' ? document.getElementById('bancoFin').selectedOptions[0].text : produto === 'auto' ? document.getElementById('bancoAuto').selectedOptions[0].text : 'Taxa personalizada';
+            const resumo=document.getElementById('textoResumoExecutivo');
+            if(resumo)resumo.textContent=(!prazoPlanoValido||credito<=0)?'Informe crédito e prazo válidos para gerar o resumo.':('Crédito de '+fmt(credito)+'. Consórcio: desembolso nominal estimado de '+fmt(desembolsoCons)+' em '+prazoCons+' meses; crédito líquido de '+fmt(creditoLiquido)+'. '+(produto==='capital_giro'?'Empréstimo empresarial':'Financiamento')+': desembolso nominal estimado de '+fmt(custoFin)+' em '+prazoFin+' meses. Diferença nominal de '+fmt(Math.abs(diferenca))+' a favor '+(diferenca>=0?'do consórcio':'da alternativa bancária')+'. Taxa bancária anual utilizada: '+jurosAA.toFixed(2)+'%. O lance e o mês de contemplação são hipóteses.');
             window.__simulacaoAtual={taxaEstimada:document.getElementById('ajustarTaxaCenario').checked && (produto==='imovel' || produto==='auto') && bancoSelecionado!=='Personalizar taxa',produto:produtoEl.options[produtoEl.selectedIndex].text,credito,prazoCons,prazoFin,mesCont,parcelaPre,parcelaPos,lanceLivre:lanceProprioAplicado,lanceEmbutido:embutidoAplicado,creditoLiquido,desembolsoCons,custoFin,diferenca,juros:fin.juros,entrada:valorEntrada,sistema,banco:bancoSelecionado,taxaAnual:jurosAA};
         }
         function textoProposta() {
             if(document.getElementById('produto').value==='investimento')return window.propostaIndice||'Calcule a projeção patrimonial antes de compartilhar.';
             const s=window.__simulacaoAtual;
             if (!s) return 'Faça uma simulação antes de compartilhar.';
-            return `📊 *Simulação ilustrativa — Consórcio x Financiamento*\nConsultor: ${consultorAtual.nome}\n\n• Segmento: ${s.produto}\n• Crédito de referência: ${fmt(s.credito)}\n• Crédito líquido no consórcio após lance embutido: ${fmt(s.creditoLiquido)}\n• Contemplação considerada apenas como hipótese: mês ${s.mesCont}\n• Parcela pré-contemplação: ${fmt(s.parcelaPre)}\n• Parcela pós-contemplação estimada: ${fmt(s.parcelaPos)}\n• Lance próprio aplicado: ${fmt(s.lanceLivre)}\n• Lance embutido aplicado: ${fmt(s.lanceEmbutido)}\n• Desembolso estimado no consórcio: ${fmt(s.desembolsoCons)}\n• Entrada no financiamento: ${fmt(s.entrada)}\n• Banco / referência: ${s.banco}\n• Taxa efetiva anual ${s.taxaEstimada ? "estimada (cenário ilustrativo)" : "informada"}: ${s.taxaAnual.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}% a.a.\n• Juros estimados do financiamento: ${fmt(s.juros)}\n• Desembolso estimado no financiamento: ${fmt(s.custoFin)}\n\nValores nominais e ilustrativos. Ajustes automáticos de taxa por entrada e prazo são hipóteses de sensibilidade, não regras dos bancos ou ofertas aprovadas. Não incluem necessariamente reajustes, seguros, tarifas, tributos ou custos previstos em contrato. A contemplação não é garantida no mês indicado.\n\n📲 ${consultorAtual.nome} — ${consultorAtual.formatado}`;
+            return `📊 *Simulação ilustrativa — Consórcio x ${document.getElementById('produto').value==='capital_giro'?'Empréstimo':'Financiamento'}*\nConsultor: ${consultorAtual.nome}\n\n• Segmento: ${s.produto}\n• Crédito de referência: ${fmt(s.credito)}\n• Crédito líquido no consórcio após lance embutido: ${fmt(s.creditoLiquido)}\n• Contemplação considerada apenas como hipótese: mês ${s.mesCont}\n• Parcela pré-contemplação: ${fmt(s.parcelaPre)}\n• Parcela pós-contemplação estimada: ${fmt(s.parcelaPos)}\n• Lance próprio aplicado: ${fmt(s.lanceLivre)}\n• Lance embutido aplicado: ${fmt(s.lanceEmbutido)}\n• Desembolso estimado no consórcio: ${fmt(s.desembolsoCons)}\n${document.getElementById('produto').value==='capital_giro'?'• Empréstimo sem entrada na simulação':'• Entrada no financiamento: '+fmt(s.entrada)}\n• Banco / referência: ${s.banco}\n• Taxa efetiva anual ${s.taxaEstimada ? "estimada (cenário ilustrativo)" : "informada"}: ${s.taxaAnual.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}% a.a.\n• Juros estimados da alternativa bancária: ${fmt(s.juros)}\n• Desembolso estimado da alternativa bancária: ${fmt(s.custoFin)}\n• Diferença nominal de desembolso: ${fmt(Math.abs(s.diferenca))} a favor ${s.diferenca>=0?'do consórcio':'da alternativa bancária'}\n• Prazo do consórcio: ${s.prazoCons} meses | prazo bancário: ${s.prazoFin} meses\n\nValores nominais e ilustrativos. Ajustes automáticos de taxa por entrada e prazo são hipóteses de sensibilidade, não regras dos bancos ou ofertas aprovadas. Não incluem necessariamente reajustes, seguros, tarifas, tributos ou custos previstos em contrato. A contemplação não é garantida no mês indicado.\n\n📲 ${consultorAtual.nome} — ${consultorAtual.formatado}`;
         }
         function enviarWhatsApp() {
             const url='https://wa.me/'+consultorAtual.numero+'?text='+encodeURIComponent(textoProposta());
@@ -911,6 +945,29 @@
         }
         
 
+        async function consultarSelicPronampe() {
+            const status=document.getElementById('statusSelicPronampe');
+            if(!status)return;
+            status.textContent='Consultando a Selic oficial no Banco Central...';
+            try {
+                const resposta=await fetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/1?formato=json',{cache:'no-store'});
+                if(!resposta.ok)throw Error('Consulta indisponível');
+                const pontos=await resposta.json();
+                const ultimo=Array.isArray(pontos)?pontos[0]:null;
+                const selic=Number(String(ultimo?.valor??'').replace(',','.'));
+                if(!ultimo||!Number.isFinite(selic)||selic<=0||selic>100)throw Error('Dado inválido');
+                const teto=selic+6;
+                status.textContent='Selic meta BCB: '+selic.toFixed(2).replace('.',',')+'% a.a. (referência '+ultimo.data+'). Teto ilustrativo Pronampe: '+teto.toFixed(2).replace('.',',')+'% a.a. (Selic + 6 p.p.). Não representa CET ou proposta.';
+                const campo=document.getElementById('jurosBanco');
+                if(document.getElementById('produto').value==='capital_giro'&&document.getElementById('modalidadeEmprestimo').value==='pronampe'){
+                    campo.value=teto.toFixed(2);
+                    calcular();
+                }
+                window.__selicPronampe={taxa:selic,data:ultimo.data};
+            } catch(error) {
+                status.textContent='Não foi possível consultar o Banco Central. Taxa de referência permanece editável; confirme a Selic vigente antes de apresentar a simulação.';
+            }
+        }
         const historicoIndices={};
         async function consultarIndices(){
           document.getElementById('statusIndice').textContent='Consultando dados oficiais...';
@@ -1237,5 +1294,6 @@
     });
   }
 </script>
+<nav class="fl-mobile-actions" aria-label="Ações rápidas no celular"><button type="button" class="fl-mobile-sim" onclick="document.getElementById('simulador').scrollIntoView({behavior:'smooth'})">Simular agora</button><button type="button" class="fl-mobile-chat" onclick="window.open('https://wa.me/'+consultorAtual.numero+'?text='+encodeURIComponent('Olá! Gostaria de conversar sobre uma simulação de crédito.'),'_blank','noopener')">Falar no WhatsApp</button></nav>
 </body>
 </html>
