@@ -267,6 +267,17 @@
                             </select>
                             <p class="text-[10px] text-slate-400 mt-1" id="notaBanco">Referência BCB: financiamento imobiliário PF, taxas reguladas pós-fixadas pela TR, setembro/2026. Não é proposta ou taxa garantida.</p>
                         </div>
+                        <div id="blocoCreditoEmpresarial" style="display:none;" class="bg-slate-900/60 border border-slate-700 rounded-lg p-3 space-y-2">
+                            <label class="block text-xs font-medium text-emerald-400">Modalidade de empréstimo para comparação</label>
+                            <select id="modalidadeEmprestimo" onchange="atualizarEmprestimoEmpresarial()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                                <option value="home">Home Equity — garantia de imóvel</option>
+                                <option value="veiculo">Refinanciamento — garantia de veículo</option>
+                                <option value="rural">Crédito rural / agrário</option>
+                                <option value="pronampe">Pronampe — micro e pequenas empresas</option>
+                            </select>
+                            <p id="notaEmprestimo" class="text-xs text-amber-200" role="status"></p>
+                            <p class="text-xs text-slate-400">Taxa anual efetiva editável abaixo. IOF, tarifas, indexadores, carência e CET devem ser conferidos na proposta; os cálculos atuais não incorporam esses custos.</p>
+                        </div>
                         <div id="blocoBancoAuto" style="display:none;">
                             <label class="block text-xs font-medium text-slate-300 mb-1">Banco / referência de taxa para automóveis</label>
                             <select id="bancoAuto" onchange="selecionarBancoAuto()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white">
@@ -539,6 +550,23 @@
                 seletor.value = 'manual';
                 }
         }
+        function atualizarEmprestimoEmpresarial(){
+            if(document.getElementById('produto').value!=='capital_giro')return;
+            const modo=document.getElementById('modalidadeEmprestimo').value;
+            const campo=document.getElementById('jurosBanco');
+            const nota=document.getElementById('notaEmprestimo');
+            document.getElementById('ajustarTaxaCenario').checked=false;
+            const dados={
+                home:{taxa:18.16,nota:'Hipótese ilustrativa de 1,40% a.m. (18,16% a.a. efetivos), NÃO é taxa oficial ou cotação de Home Equity. Confirme CET, indexador e garantia.'},
+                veiculo:{taxa:23.87,nota:'Hipótese ilustrativa de 1,80% a.m. (23,87% a.a. efetivos), NÃO é taxa oficial ou cotação de refinanciamento de veículo. Confirme CET e garantia.'},
+                rural:{taxa:0,nota:'Crédito rural: taxas variam por programa, safra e enquadramento. Informe a taxa efetiva anual da proposta antes de comparar; 0% é campo pendente, não oferta.'},
+                pronampe:{taxa:0,nota:'Pronampe: teto legal Selic + até 6 pontos percentuais ao ano, sujeito às regras vigentes. Informe a taxa efetiva anual da operação; 0% é campo pendente, não oferta. Prazo legal máximo: 72 meses.'}
+            };
+            campo.value=dados[modo].taxa.toFixed(2);
+            nota.textContent=dados[modo].nota;
+            if(modo==='pronampe'&&Number(document.getElementById('prazoFin').value)>72)document.getElementById('prazoFin').value=72;
+            calcular();
+        }
         function mudarProduto() {
             const prod = document.getElementById('produto').value;
             const presets = {
@@ -563,11 +591,12 @@
             document.getElementById('fundoReservaPct').value=['imovel','auto','moto','pesados','maquinario','luxo','embarcacao'].includes(prod)?2.5:p.reserva;
             document.getElementById('seguroMensalPct').value=0;
             document.getElementById('jurosBanco').value=p.juros;
-            document.getElementById('entradaPct').value=p.entrada;
+            document.getElementById('entradaPct').value=prod==='capital_giro'?0:p.entrada;
             atualizarBancoPorProduto(prod);
             atualizarTaxaCenario();
             document.getElementById('painelIndices').style.display=prod==='investimento'?'block':'none';
             document.getElementById('tabelaUnifisa').style.display=['imovel','auto','moto','pesados','maquinario','luxo','embarcacao'].includes(prod)?'block':'none';
+            document.getElementById('blocoCreditoEmpresarial').style.display=prod==='capital_giro'?'block':'none';
             document.getElementById('planoUnifisa').value='';
             atualizarTabelaUnifisa();
             document.getElementById('ativarReduzida').checked=false;
@@ -577,6 +606,7 @@
             document.getElementById('textoDiferencas').parentElement.style.display=investimento?'none':'block';
             document.getElementById('blocoBancoImovel').parentElement.style.display=investimento?'none':'block';
             document.getElementById('mesContemplacao').value=p.mes;
+            if(prod==='capital_giro')atualizarEmprestimoEmpresarial();
             document.getElementById('lanceLivre').value='0,00';
             document.getElementById('lanceEmbutidoPct').value=0;
             document.getElementById('ativarReduzida').checked=false;
@@ -769,7 +799,7 @@
             if(prazoPlanoValido&&credito>0)desenharGraficoComparativo(desembolsoCons,custoFin,prazoCons,prazoFin,valorEntrada,mesCont,parcelaReduzida,adicionalInicial,mesesTaxaAntecipada,parcelaPos,lanceProprioAplicado,sistema,principalFin,jurosAA);
             else {document.getElementById('graficoComparativo').replaceChildren();document.getElementById('graficoComparativoResumo').textContent='Ajuste o crédito ou prazo para exibir a comparação.';}
             document.getElementById('labelParcPre').textContent=mesesTaxaAntecipada?`Parcela inicial com antecipação de ${planoSelecionado.antecipacao}%${mesesTaxaAntecipada>1?' (diluída em '+mesesTaxaAntecipada+' meses)':''}:`:(ativarRed?`Parcela reduzida até o mês ${mesCont}:`:'Parcela estimada antes da contemplação:');
-            document.getElementById('divSubTituloFin').textContent=`Financiamento (${sistema.toUpperCase()})`;
+            document.getElementById('divSubTituloFin').textContent=produto==='capital_giro'?`Empréstimo empresarial (${sistema.toUpperCase()})`:`Financiamento (${sistema.toUpperCase()})`;
             document.getElementById('cardTitle1').textContent='Diferença estimada de desembolso';
             document.getElementById('cardTitle2').textContent='Crédito líquido no consórcio';
             document.getElementById('cardTitle3').textContent='Efeito estimado do lance';
@@ -785,6 +815,7 @@
             if(ativarRed) aviso.push('Parcela reduzida calculada sobre fundo comum, administração e reserva, mantendo seguro integral; recálculo após contemplação é uma estimativa sem reajustes.');
             if(document.getElementById('planoUnifisa').value==='gamma12') aviso.push('Gamma 12: não foi localizada tabela própria no PDF oficial fornecido. Os valores não estão homologados.');
             if (credito<=0) aviso.push('Informe um valor de crédito maior que zero.');
+            if(produto==='capital_giro'&&jurosAA===0)aviso.push('A taxa do empréstimo ainda não foi informada. Comparação não deve ser usada até inserir a taxa efetiva anual da proposta.');
             if (lancePretendido>saldoAntesLance+0.01) aviso.push('O lance informado supera o saldo estimado após as parcelas anteriores; o simulador limitou o abatimento ao saldo disponível.');
             if (lanceEmbutido>credito*0.30+0.01) aviso.push('Confirme o limite de lance embutido permitido no regulamento do grupo.');
             if (mesesDepois===0 && lanceAplicado>0) aviso.push('A contemplação foi simulada no último mês; não há parcelas posteriores para redistribuir.');
