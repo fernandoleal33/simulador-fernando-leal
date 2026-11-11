@@ -26,7 +26,9 @@ for(const [id,credito,prazo,esperado] of casos){
  assert.ok(Math.abs(real-esperado)<=0.011,id+': esperado '+esperado+' obtido '+real);
  console.log('OK',id,credito,prazo,real.toFixed(2));
 }
-assert.match(html,/Gamma 12 não localizada/);
+assert.deepEqual(Array.from(tabela.imovel.gamma12.adm),Array.from(tabela.imovel.gamma.adm));
+assert.equal(tabela.imovel.delta.antecipacao,0);
+assert.equal(tabela.imovel.delta.adm[tabela.imovel.delta.prazos.indexOf(60)],15);
 assert.match(html,/condição personalizada \(não homologada\)/);
 assert.doesNotMatch(html,/gerarPropostaPDF|nomeClientePDF|Salvar esta simulação em PDF/);
 assert.match(html,/function gerarLinkConsultor\(\)/);
