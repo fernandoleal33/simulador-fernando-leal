@@ -376,7 +376,8 @@
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400" id="labelParcPre">Parcela Pré-Contemplação:</span> <strong id="valParcRed">R$ 0</strong></div>
                             
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400" id="labelParcPos">Parcela após contemplação (hipótese):</span> <strong id="valParcPos" class="text-emerald-400">R$ 0</strong></div>
-                            <div id="linhaAposAntecipacao" class="flex justify-between py-1 border-b border-slate-800" style="display:none"><span class="text-slate-400" id="labelAposAntecipacao">2ª parcela em diante (antes da contemplação):</span><strong id="valAposAntecipacao">R$ 0</strong></div>
+                                                        <div id="linhaPrazoPosLance" class="flex justify-between py-1 border-b border-slate-800" style="display:none"><span class="text-slate-400">Prazo restante após o lance (estimativa):</span><strong id="valPrazoPosLance" class="text-emerald-400">—</strong></div>
+<div id="linhaAposAntecipacao" class="flex justify-between py-1 border-b border-slate-800" style="display:none"><span class="text-slate-400" id="labelAposAntecipacao">2ª parcela em diante (antes da contemplação):</span><strong id="valAposAntecipacao">R$ 0</strong></div>
                             <div id="linhaResumoPlano" class="py-2 text-xs text-slate-300 border-b border-slate-800"></div>
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Lance com recurso próprio:</span> <strong id="valLanceProprio" class="text-white">R$ 0</strong></div>
                             <div class="flex justify-between py-1 border-b border-slate-800"><span class="text-slate-400">Lance embutido:</span> <strong id="valLanceEmbutidoResumo" class="text-white">R$ 0</strong></div>
@@ -848,6 +849,8 @@
             if(!prazoPlanoValido)document.getElementById('linhaResumoPlano').textContent='ATENÇÃO: crédito ou prazo fora das condições cadastradas do Plano Power/tabela comercial. Resultados não válidos para proposta.';
             document.getElementById('valParcRed').textContent=fmt(parcelaPre);
             document.getElementById('valParcPos').textContent=fmt(parcelaPos);
+            document.getElementById('linhaPrazoPosLance').style.display=modoAbate==='prazo'?'flex':'none';
+            document.getElementById('valPrazoPosLance').textContent=prazoRestante+' mês(es) restantes (redução de '+reducaoMeses+' mês(es))';
             document.getElementById('valLanceProprio').textContent=fmt(lanceProprioAplicado);
             document.getElementById('valLanceEmbutidoResumo').textContent=fmt(embutidoAplicado);
             document.getElementById('valCreditoLiquido').textContent=fmt(creditoLiquido);
