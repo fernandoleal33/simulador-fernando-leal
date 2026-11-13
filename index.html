@@ -1076,12 +1076,18 @@
           const detalhe=document.getElementById('detalheUnifisa');
           if(!plano){detalhe.textContent='Selecione uma tabela para preencher a taxa administrativa automaticamente; crédito e prazo permanecem manuais.';calcular();return;}
           const campoPrazo=document.getElementById('prazoConsorcio');
-          // Ao selecionar um plano, usar um prazo comercial válido sem exigir sair e voltar ao campo.
-          if(!plano.prazos.includes(Number(campoPrazo.value)) && document.activeElement===document.getElementById('planoUnifisa')){
-            campoPrazo.value=plano.prazos[0];
+          const credito=parseMoeda(document.getElementById('credito').value);
+          // Power: ao escolher a tabela, selecionar somente prazos permitidos
+          // para o valor do crédito, evitando deixar a taxa em branco.
+          const limitePower=credito<100000?80:credito<150000?100:120;
+          const prazosElegiveis=plano.power?plano.prazos.filter(p=>p<=limitePower):plano.prazos;
+          if(document.activeElement===document.getElementById('planoUnifisa')
+             && !prazosElegiveis.includes(Number(campoPrazo.value))
+             && (!plano.power||(credito>=70000&&credito<=300000))
+             && prazosElegiveis.length){
+            campoPrazo.value=prazosElegiveis[0];
           }
           const prazo=Math.max(1,Number(campoPrazo.value)||1);
-          const credito=parseMoeda(document.getElementById('credito').value);
           if(plano.power && (credito<70000||credito>300000||prazo>(credito<100000?80:credito<150000?100:120))){
             detalhe.textContent='Plano Power: crédito de R$ 70.000 a R$ 300.000; até 80 meses para crédito inferior a R$ 100.000, até 100 meses para crédito inferior a R$ 150.000 e até 120 meses para crédito de R$ 150.000 ou mais. Confirme grupo e vigência.';
             document.getElementById('taxaAdmAnual').value='';
