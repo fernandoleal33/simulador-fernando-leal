@@ -1113,7 +1113,14 @@
           const mensal=(total-ant)/prazo;
           const mensalReduzido=plano.reducao?((credito*(1+(adm+reserva)/100)/prazo)*plano.reducao+credito*(1+(adm+reserva)/100)*seguro/100-ant/prazo):mensal;
           const comAnt=mensalReduzido+(meses?ant/meses:0);
-          detalhe.replaceChildren(); // Os valores ficam apenas no resumo financeiro, evitando duplicidade.
+          // O limite por faixa de crédito é apenas o teto: o cliente pode
+          // escolher qualquer prazo menor que conste na tabela comercial.
+          if(plano.power){
+            const opcoes=prazosElegiveis.slice().sort((a,b)=>a-b);
+            detalhe.textContent='Prazos disponíveis para este crédito: '+opcoes.join(', ')+' meses. Você pode escolher qualquer um desses prazos; a taxa e a antecipação serão recalculadas automaticamente. Condições sujeitas à confirmação do grupo.';
+          }else{
+            detalhe.replaceChildren(); // Os valores ficam apenas no resumo financeiro, evitando duplicidade.
+          }
           calcular();
         }
         const consultorPadrao = {nome:'Fernando Leal',numero:'5511947662843'};
