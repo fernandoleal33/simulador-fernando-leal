@@ -313,6 +313,7 @@
                                 <option value="pan">Banco PAN</option>
                                 <option value="bv">BV</option>
                                 <option value="bradesco">Bradesco</option>
+                                <option value="safra">Banco Safra (taxa sob consulta)</option>
                                 <option value="manual">Personalizar taxa</option>
                             </select>
                             <p id="notaBancoAuto" class="text-[10px] text-slate-400 mt-1">Taxas anuais ilustrativas e editáveis, não ofertas bancárias. Confirme a taxa efetiva e o CET da proposta.</p>
@@ -510,8 +511,8 @@
         }
         function atualizarTaxaCenario() {
             const produto = document.getElementById('produto').value;
-            const banco = produto === 'imovel' ? document.getElementById('bancoFin').value : produto === 'auto' ? document.getElementById('bancoAuto').value : 'manual';
-            const ativo = document.getElementById('ajustarTaxaCenario').checked && banco !== 'manual' && (produto === 'imovel' || produto === 'auto');
+            const banco = produto === 'imovel' ? document.getElementById('bancoFin').value : (produto === 'auto' || produto === 'luxo') ? document.getElementById('bancoAuto').value : 'manual';
+            const ativo = document.getElementById('ajustarTaxaCenario').checked && banco !== 'manual' && banco !== 'safra' && (produto === 'imovel' || produto === 'auto' || produto === 'luxo');
             const campo = document.getElementById('jurosBanco');
             const nota = document.getElementById('explicacaoTaxaCenario');
             if (!ativo) {
@@ -557,9 +558,14 @@
             const banco = document.getElementById('bancoAuto').value;
             const campo = document.getElementById('jurosBanco');
             const nota = document.getElementById('notaBancoAuto');
-            if (banco === 'manual') {
+            if (banco === 'manual' || banco === 'safra') {
                 document.getElementById('ajustarTaxaCenario').checked = false;
-                nota.textContent = 'Taxa personalizada. Confirme taxa efetiva anual e CET na proposta bancária.';
+                if(banco === 'safra'){
+                    campo.value=(document.getElementById('produto').value==='luxo'?15.5:15.5).toFixed(2);
+                    nota.textContent='Banco Safra: 15,50% a.a. é apenas hipótese ilustrativa, NÃO é taxa média verificada do Safra nem oferta. Ajuste conforme proposta e confirme CET.';
+                }else{
+                    nota.textContent = 'Taxa personalizada. Confirme taxa efetiva anual e CET na proposta bancária.';
+                }
             } else {
                 campo.value = taxasBancosAuto[banco].toFixed(2);
                 taxaBaseSelecionada = taxasBancosAuto[banco];
@@ -599,7 +605,7 @@
             const blocoAuto = document.getElementById('blocoBancoAuto');
             const seletor = document.getElementById('bancoFin');
             bloco.style.display = prod === 'imovel' ? 'block' : 'none';
-            blocoAuto.style.display = prod === 'auto' ? 'block' : 'none';
+            blocoAuto.style.display = (prod === 'auto' || prod === 'luxo') ? 'block' : 'none';
             const blocoEspecial=document.getElementById('blocoBancoEspecial');
             blocoEspecial.style.display=bancosEspeciais[prod]?'block':'none';
             if(bancosEspeciais[prod]){
@@ -613,7 +619,7 @@
             if (prod === 'imovel') {
                 if (seletor.value === 'manual') seletor.value = 'caixa';
                 selecionarBanco();
-            } else if (prod === 'auto') {
+            } else if (prod === 'auto' || prod === 'luxo') {
                 selecionarBancoAuto();
             } else {
                 seletor.value = 'manual';
