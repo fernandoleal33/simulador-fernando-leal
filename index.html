@@ -580,9 +580,17 @@
             const sel=document.getElementById('bancoEspecial');
             const nome=sel.options[sel.selectedIndex]?.textContent||'Instituição selecionada';
             document.getElementById('ajustarTaxaCenario').checked=false;
+            const referencias={
+                pesados:{geral:16.10,finame:18.76,origem:'16,10% a.a. é cenário ilustrativo de pesados; 18,76% a.a. é referência FINAME divulgada para outubro/2026, não taxa contratada.'},
+                maquinario:{geral:18.76,finame:18.76,origem:'18,76% a.a. é referência ilustrativa FINAME divulgada para outubro/2026, não média específica do banco.'},
+                embarcacao:{geral:15.00,finame:15.00,origem:'15,00% a.a. é hipótese de simulação, sem média bancária específica verificada para embarcações.'}
+            };
+            const ref=referencias[produto];
+            const taxa=sel.value==='bb'&&produto!=='embarcacao'?ref.finame:ref.geral;
+            document.getElementById('jurosBanco').value=taxa.toFixed(2);
             document.getElementById('notaBancoEspecial').textContent=
-                (sel.value==='manual'?'Taxa personalizada.':nome+': taxa sob consulta.')+
-                ' Informe no campo abaixo a taxa efetiva anual da proposta; confirme CET, entrada, prazo, garantias e eventuais indexadores. O valor atual é apenas hipótese ilustrativa, não taxa do banco.';
+                (sel.value==='manual'?'Referência inicial editável. ':nome+': referência de segmento, não cotação desta instituição. ')+
+                ref.origem+' Ajuste a taxa conforme proposta real; confirme CET, entrada, prazo, garantias e indexadores.';
             atualizarTaxaCenario();
             calcular();
         }
